@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZeroGuard — Zero-Day Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ── RESET & BASE ────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+button{cursor:pointer;border:none;background:none;font:inherit}
+input{font:inherit}
+table{border-collapse:collapse;width:100%}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+/* ── DARK THEME ──────────────────────────────────────── */
+[data-theme="dark"]{
+  --bg:#0d0f14;
+  --surface:#131720;
+  --surface2:#1a2030;
+  --surface3:#1f2638;
+  --border:#252d3d;
+  --border2:#2e3850;
+  --text:#e2e8f0;
+  --text2:#94a3b8;
+  --text3:#64748b;
+  --accent:#3b82f6;
+  --accent-h:#2563eb;
+  --accent-dim:rgba(59,130,246,0.12);
+  --green:#22c55e;
+  --green-dim:rgba(34,197,94,0.12);
+  --red:#ef4444;
+  --red-dim:rgba(239,68,68,0.12);
+  --orange:#f97316;
+  --orange-dim:rgba(249,115,22,0.12);
+  --yellow:#eab308;
+  --yellow-dim:rgba(234,179,8,0.12);
+  --purple:#a855f7;
+  --purple-dim:rgba(168,85,247,0.12);
+  --cyan:#06b6d4;
+  --cyan-dim:rgba(6,182,212,0.12);
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+  --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+}
+[data-theme="light"]{
+  --bg:#f1f5f9;
+  --surface:#ffffff;
+  --surface2:#f8fafc;
+  --surface3:#f1f5f9;
+  --border:#e2e8f0;
+  --border2:#cbd5e1;
+  --text:#0f172a;
+  --text2:#475569;
+  --text3:#94a3b8;
+  --accent:#2563eb;
+  --accent-h:#1d4ed8;
+  --accent-dim:rgba(37,99,235,0.1);
+  --green:#16a34a;
+  --green-dim:rgba(22,163,74,0.1);
+  --red:#dc2626;
+  --red-dim:rgba(220,38,38,0.1);
+  --orange:#ea580c;
+  --orange-dim:rgba(234,88,12,0.1);
+  --yellow:#ca8a04;
+  --yellow-dim:rgba(202,138,4,0.1);
+  --purple:#9333ea;
+  --purple-dim:rgba(147,51,234,0.1);
+  --cyan:#0891b2;
+  --cyan-dim:rgba(8,145,178,0.1);
+  --shadow:0 4px 24px rgba(0,0,0,0.08);
+  --shadow-sm:0 2px 8px rgba(0,0,0,0.06);
+}
+
+body{background:var(--bg);color:var(--text)}
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.logo-area{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2}
+.logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.logo-sub{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
+.nav-section{padding:12px 8px 4px}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all 0.15s;margin-bottom:1px;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+.credit-text{font-size:10px;color:var(--text3);text-align:center;line-height:1.5}
+.credit-name{color:var(--accent);font-weight:600;font-size:11px}
+
+/* ── TOPBAR ──────────────────────────────────────────── */
+.topbar-title{font-size:15px;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.search-wrap{position:relative}
+.search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px 7px 32px;color:var(--text);font-size:13px;width:220px;outline:none;transition:all 0.15s}
+.search-input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-dim)}
+.search-input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;pointer-events:none}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--text3);fill:none;stroke-width:2;cursor:pointer;display:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;transition:all 0.15s;cursor:pointer;border:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-h)}
+.btn-primary:active{transform:scale(0.97)}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--surface3);color:var(--text)}
+.btn-ghost:active{transform:scale(0.97)}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform 0.4s}
+.btn.syncing svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.theme-btn{width:34px;height:34px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2)}
+.theme-btn:hover{background:var(--surface3);color:var(--text)}
+.theme-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.last-sync{font-size:11px;color:var(--text3)}
+
+/* ── TOAST ───────────────────────────────────────────── */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text);box-shadow:var(--shadow);z-index:9999;transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;display:flex;align-items:center;gap:10px}
+#toast.show{transform:translateY(0);opacity:1}
+#toast .toast-icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+#toast.success .toast-icon{stroke:var(--green)}
+#toast.error .toast-icon{stroke:var(--red)}
+#toast.info .toast-icon{stroke:var(--accent)}
+
+/* ── PAGE SECTIONS ───────────────────────────────────── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── KPI CARDS ───────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;transition:box-shadow 0.15s}
+.kpi-card:hover{box-shadow:var(--shadow-sm)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.kpi-val{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:6px}
+.kpi-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.kpi-meta span{color:var(--green);font-weight:600}
+.kpi-meta span.down{color:var(--red)}
+.kpi-critical .kpi-val{color:var(--red)}
+.kpi-high .kpi-val{color:var(--orange)}
+.kpi-kev .kpi-val{color:var(--purple)}
+.kpi-ot .kpi-val{color:var(--cyan)}
+.kpi-total .kpi-val{color:var(--accent)}
+
+/* ── CHART SECTION ───────────────────────────────────── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.chart-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px}
+.chart-wrap{position:relative;height:200px}
+
+/* ── SECTION HEADER ──────────────────────────────────── */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:15px;font-weight:600;color:var(--text)}
+.section-count{font-size:12px;color:var(--text3);margin-left:8px}
+
+/* ── FILTER CHIPS ────────────────────────────────────── */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all 0.15s}
+.chip:hover{background:var(--surface3);color:var(--text)}
+.chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.chip.red.active{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.chip.orange.active{background:var(--orange-dim);border-color:var(--orange);color:var(--orange)}
+.chip.purple.active{background:var(--purple-dim);border-color:var(--purple);color:var(--purple)}
+
+/* ── CVE TABLE ───────────────────────────────────────── */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cve-table{width:100%;font-size:13px}
+.cve-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+.cve-table th:hover{color:var(--text)}
+.cve-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.cve-table tr:last-child td{border-bottom:none}
+.cve-table tr.data-row{cursor:pointer;transition:background 0.1s}
+.cve-table tr.data-row:hover{background:var(--surface2)}
+.cve-table tr.data-row.selected{background:var(--accent-dim)}
+.cve-id{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--accent)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge-critical{background:var(--red-dim);color:var(--red)}
+.badge-high{background:var(--orange-dim);color:var(--orange)}
+.badge-medium{background:var(--yellow-dim);color:var(--yellow)}
+.badge-low{background:var(--green-dim);color:var(--green)}
+.badge-kev{background:var(--purple-dim);color:var(--purple)}
+.badge-ot{background:var(--cyan-dim);color:var(--cyan)}
+.badge-it{background:var(--accent-dim);color:var(--accent)}
+.no-results{padding:40px;text-align:center;color:var(--text3);font-size:13px}
+.highlight{background:var(--yellow-dim);color:var(--yellow);border-radius:2px;padding:0 2px}
+
+/* ── DETAIL PANEL ────────────────────────────────────── */
+#detailPanel{position:fixed;right:-440px;top:0;width:440px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:1000;display:flex;flex-direction:column;transition:right 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,0.3)}
+#detailPanel.open{right:0}
+.panel-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;flex-shrink:0}
+.panel-hdr-info{flex:1;min-width:0}
+.panel-close{width:28px;height:28px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border:1px solid var(--border)}
+.panel-close:hover{background:var(--surface3)}
+.panel-close svg{width:14px;height:14px;stroke:var(--text2);fill:none;stroke-width:2}
+.panel-body{flex:1;overflow-y:auto;padding:20px}
+.panel-section{margin-bottom:18px}
+.panel-section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.panel-field{display:flex;gap:8px;margin-bottom:6px;font-size:13px}
+.panel-field-label{color:var(--text3);width:110px;flex-shrink:0}
+.panel-field-val{color:var(--text);font-weight:500;word-break:break-word}
+.panel-desc{font-size:13px;color:var(--text2);line-height:1.6;padding:10px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)}
+.step-list{list-style:none}
+.step-list li{display:flex;gap:10px;padding:6px 0;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border)}
+.step-list li:last-child{border-bottom:none}
+.step-num{width:20px;height:20px;background:var(--accent-dim);color:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ref-link{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-size:12px;padding:4px 8px;background:var(--accent-dim);border-radius:4px;margin:2px;cursor:pointer}
+.ref-link:hover{background:var(--accent);color:#fff}
+
+/* ── OT ADVISORIES ───────────────────────────────────── */
+.ot-tabs{display:flex;gap:6px;margin-bottom:16px}
+.ot-tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all 0.15s}
+.ot-tab:hover{background:var(--surface3);color:var(--text)}
+.ot-tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.ot-panel{display:none}
+.ot-panel.active{display:block}
+.advisory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.advisory-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:box-shadow 0.15s,border-color 0.15s;cursor:pointer}
+.advisory-card:hover{box-shadow:var(--shadow-sm);border-color:var(--border2)}
+.adv-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.adv-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.adv-icon.critical{background:var(--red-dim);color:var(--red)}
+.adv-icon.high{background:var(--orange-dim);color:var(--orange)}
+.adv-icon.medium{background:var(--yellow-dim);color:var(--yellow)}
+.adv-title-wrap{flex:1;min-width:0}
+.adv-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:3px}
+.adv-sub{font-size:11px;color:var(--text3)}
+.adv-body{padding:12px 16px}
+.adv-row{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:6px}
+.adv-row:last-child{margin-bottom:0}
+.adv-row-label{color:var(--text3);width:80px;flex-shrink:0}
+.adv-row-val{color:var(--text2);font-weight:500}
+.adv-detail{display:none;padding:0 16px 14px;border-top:1px solid var(--border);margin-top:4px}
+.adv-detail.open{display:block}
+.adv-detail-text{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.adv-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.adv-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;text-decoration:none;color:#fff}
+.adv-btn-cisa{background:#c0392b}
+.adv-btn-cisa:hover{background:#a93226}
+.adv-btn-nvd{background:#2980b9}
+.adv-btn-nvd:hover{background:#2471a3}
+.adv-btn-vendor{background:#27ae60}
+.adv-btn-vendor:hover{background:#229954}
+
+/* ── TIMELINE ────────────────────────────────────────── */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--surface);flex-shrink:0}
+.tl-dot.critical{background:var(--red)}
+.tl-dot.high{background:var(--orange)}
+.tl-dot.medium{background:var(--yellow)}
+.tl-dot.info{background:var(--accent)}
+.tl-dot.ot{background:var(--cyan)}
+.tl-dot.success{background:var(--green)}
+.tl-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.tl-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tl-date{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.tl-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* ── OVERVIEW FEEDS ──────────────────────────────────── */
+.feeds-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.feed-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.feed-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.feed-hdr-title{font-size:13px;font-weight:600;color:var(--text)}
+.feed-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px var(--green)}
+.feed-list{padding:8px 0}
+.feed-item{padding:8px 16px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:background 0.1s}
+.feed-item:hover{background:var(--surface2)}
+.feed-item-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.feed-item-content{flex:1;min-width:0}
+.feed-item-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.3;margin-bottom:2px}
+.feed-item-meta{font-size:11px;color:var(--text3)}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .charts-row{grid-template-columns:1fr}
+  .feeds-row{grid-template-columns:1fr}
+  #detailPanel{width:100vw}
+  .advisory-grid{grid-template-columns:1fr}
+  .search-input{width:160px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">ZeroGuard</div>
+        <div class="logo-sub">Threat Intel</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Dashboards</div>
+      <button class="nav-item active" onclick="showPage('overview',this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Overview
+      </button>
+      <button class="nav-item" onclick="showPage('it-vulns',this)">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        IT Vulnerabilities
+        <span class="nav-badge">18</span>
+      </button>
+      <button class="nav-item" onclick="showPage('ot-ics',this)">
+        <svg viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        OT / ICS Advisories
+        <span class="nav-badge" style="background:var(--cyan)">12</span>
+      </button>
+      <button class="nav-item" onclick="showPage('timeline-pg',this)">
+        <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Activity Timeline
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Sources</div>
+      <a class="nav-item" href="https://www.cisa.gov/ics-advisories" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        CISA ICS
+      </a>
+      <a class="nav-item" href="https://nvd.nist.gov/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        NIST NVD
+      </a>
+      <a class="nav-item" href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        CISA KEV
+      </a>
+      <a class="nav-item" href="https://www.zerodayinitiative.com/advisories/published/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        ZDI
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="credit-text">
+        Created &amp; Designed by<br>
+        <span class="credit-name">Ahmed Khalil</span><br>
+        <span style="color:var(--text3);font-size:10px">ZeroGuard v2.1 &bull; Mar 2026</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="pageTitle">Overview</div>
+        <div class="topbar-sub">Zero-Day &amp; CVE Intelligence &bull; Updated <span id="syncTime">14:00 UTC</span></div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" id="globalSearch" type="text" placeholder="Search CVE, vendor, product…" autocomplete="off">
+          <svg class="search-clear" id="searchClear" viewBox="0 0 24 24" onclick="clearSearch()"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        <button class="btn btn-primary" id="syncBtn" onclick="doSync()">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          Sync Now
+        </button>
+        <button class="btn btn-ghost" onclick="exportCSV()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content" id="mainContent">
+
+      <!-- ── OVERVIEW PAGE ───────────────────────── -->
+      <div class="page active" id="page-overview">
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-critical">
+            <div class="kpi-label">Critical CVEs</div>
+            <div class="kpi-val">7</div>
+            <div class="kpi-meta"><span class="down">+3</span> vs last week</div>
+          </div>
+          <div class="kpi-card kpi-high">
+            <div class="kpi-label">High Severity</div>
+            <div class="kpi-val">11</div>
+            <div class="kpi-meta"><span>+5</span> new this week</div>
+          </div>
+          <div class="kpi-card kpi-kev">
+            <div class="kpi-label">KEV / Exploited</div>
+            <div class="kpi-val">4</div>
+            <div class="kpi-meta"><span class="down">CISA listed</span></div>
+          </div>
+          <div class="kpi-card kpi-ot">
+            <div class="kpi-label">OT Products Affected</div>
+            <div class="kpi-val">28</div>
+            <div class="kpi-meta"><span>ICS advisories</span></div>
+          </div>
+          <div class="kpi-card kpi-total">
+            <div class="kpi-label">Total Disclosures</div>
+            <div class="kpi-val">47</div>
+            <div class="kpi-meta"><span>Mar 2026</span></div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-title">Severity Distribution — Mar 2026</div>
+            <div class="chart-wrap"><canvas id="severityChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">IT vs OT vs ICS Breakdown</div>
+            <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="feeds-row">
+          <div class="feed-card">
+            <div class="feed-hdr">
+              <div class="feed-dot"></div>
+              <div class="feed-hdr-title">Latest CISA ICS Advisories</div>
+            </div>
+            <div class="feed-list">
+              <div class="feed-item" onclick="showPage('ot-ics',document.querySelector('[onclick*=ot-ics]'))">
+                <div class="feed-item-dot" style="background:var(--red)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">Schneider Electric Modicon M340 / M580 — ICSA-26-079-01</div>
+                  <div class="feed-item-meta">CVSS 9.8 &bull; Remote Code Execution &bull; Mar 20, 2026</div>
+                </div>
+              </div>
+              <div class="feed-item" onclick="showPage('ot-ics',document.querySelector('[onclick*=ot-ics]'))">
+                <div class="feed-item-dot" style="background:var(--red)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">Siemens SICAM A8000 Series — ICSA-26-079-02</div>
+                  <div class="feed-item-meta">CVSS 9.1 &bull; Auth Bypass &bull; Mar 20, 2026</div>
+                </div>
+              </div>
+              <div class="feed-item" onclick="showPage('ot-ics',document.querySelector('[onclick*=ot-ics]'))">
+                <div class="feed-item-dot" style="background:var(--orange)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">Honeywell IQ4x Building Controller — ICSA-26-068-01</div>
+                  <div class="feed-item-meta">CVSS 8.8 &bull; Path Traversal &bull; Mar 9, 2026</div>
+                </div>
+              </div>
+              <div class="feed-item" onclick="showPage('ot-ics',document.querySelector('[onclick*=ot-ics]'))">
+                <div class="feed-item-dot" style="background:var(--orange)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">Rockwell Automation FactoryTalk — ICSA-26-079-05</div>
+                  <div class="feed-item-meta">CVSS 8.5 &bull; Deserialization &bull; Mar 20, 2026</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="feed-card">
+            <div class="feed-hdr">
+              <div class="feed-dot" style="background:var(--red)"></div>
+              <div class="feed-hdr-title">Critical IT CVEs — Active Exploitation</div>
+            </div>
+            <div class="feed-list">
+              <div class="feed-item" onclick="showPage('it-vulns',document.querySelector('[onclick*=it-vulns]'));filterByChip('KEV')">
+                <div class="feed-item-dot" style="background:var(--purple)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">CVE-2026-1281 — Ivanti EPMM Remote Code Execution</div>
+                  <div class="feed-item-meta">CVSS 9.8 &bull; CISA KEV &bull; Actively Exploited</div>
+                </div>
+              </div>
+              <div class="feed-item" onclick="showPage('it-vulns',document.querySelector('[onclick*=it-vulns]'))">
+                <div class="feed-item-dot" style="background:var(--red)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">CVE-2026-21536 — Microsoft Windows CLFS Elevation</div>
+                  <div class="feed-item-meta">CVSS 9.8 &bull; Patch Tuesday Mar 10 &bull; KEV</div>
+                </div>
+              </div>
+              <div class="feed-item" onclick="showPage('it-vulns',document.querySelector('[onclick*=it-vulns]'))">
+                <div class="feed-item-dot" style="background:var(--red)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">CVE-2026-0075 — Palo Alto PAN-OS Auth Bypass</div>
+                  <div class="feed-item-meta">CVSS 9.3 &bull; Firewall / NGFW &bull; CISA Alert</div>
+                </div>
+              </div>
+              <div class="feed-item" onclick="showPage('it-vulns',document.querySelector('[onclick*=it-vulns]'))">
+                <div class="feed-item-dot" style="background:var(--orange)"></div>
+                <div class="feed-item-content">
+                  <div class="feed-item-title">CVE-2026-0199 — Fortinet FortiGate SSL-VPN RCE</div>
+                  <div class="feed-item-meta">CVSS 9.0 &bull; FortiOS 7.x &bull; Patch Available</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── IT VULNERABILITIES PAGE ────────────── -->
+      <div class="page" id="page-it-vulns">
+        <div class="section-hdr">
+          <div>
+            <span class="section-title">IT Vulnerabilities</span>
+            <span class="section-count" id="itCount"></span>
+          </div>
+        </div>
+        <div class="filter-row" id="filterRow">
+          <button class="chip active" onclick="filterByChip('ALL',this)">All</button>
+          <button class="chip red" onclick="filterByChip('CRITICAL',this)">Critical</button>
+          <button class="chip orange" onclick="filterByChip('HIGH',this)">High</button>
+          <button class="chip" onclick="filterByChip('MEDIUM',this)">Medium</button>
+          <button class="chip purple" onclick="filterByChip('KEV',this)">KEV / Exploited</button>
+        </div>
+        <div class="table-wrap">
+          <table class="cve-table" id="cveTable">
+            <thead>
+              <tr>
+                <th onclick="sortTable('cve')">CVE ID</th>
+                <th onclick="sortTable('vendor')">Vendor</th>
+                <th onclick="sortTable('product')">Product</th>
+                <th onclick="sortTable('cvss')">CVSS</th>
+                <th onclick="sortTable('severity')">Severity</th>
+                <th onclick="sortTable('type')">Type</th>
+                <th onclick="sortTable('status')">Status</th>
+              </tr>
+            </thead>
+            <tbody id="cveBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── OT / ICS PAGE ──────────────────────── -->
+      <div class="page" id="page-ot-ics">
+        <div class="section-hdr">
+          <span class="section-title">OT / ICS Advisories</span>
+        </div>
+        <div class="ot-tabs">
+          <button class="ot-tab active" id="otTab0" onclick="switchOtTab(0)">Week Mar 16–22 (AV26-265)</button>
+          <button class="ot-tab" id="otTab1" onclick="switchOtTab(1)">Week Mar 9–15 (AV26-241)</button>
+          <button class="ot-tab" id="otTab2" onclick="switchOtTab(2)">ICS-Specific CVEs</button>
+        </div>
+        <div class="ot-panel active" id="otPanel0">
+          <div class="advisory-grid" id="advGrid0"></div>
+        </div>
+        <div class="ot-panel" id="otPanel1">
+          <div class="advisory-grid" id="advGrid1"></div>
+        </div>
+        <div class="ot-panel" id="otPanel2">
+          <div class="advisory-grid" id="advGrid2"></div>
+        </div>
+      </div>
+
+      <!-- ── TIMELINE PAGE ──────────────────────── -->
+      <div class="page" id="page-timeline-pg">
+        <div class="section-hdr">
+          <span class="section-title">Activity Timeline — 2026</span>
+        </div>
+        <div class="timeline" id="timelineContainer"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div id="detailPanel">
+  <div class="panel-hdr">
+    <div class="panel-hdr-info">
+      <div id="panelCveId" class="cve-id" style="font-size:14px;margin-bottom:4px"></div>
+      <div id="panelTitle" style="font-size:15px;font-weight:600;color:var(--text);line-height:1.3"></div>
+    </div>
+    <button class="panel-close" onclick="closePanel()" aria-label="Close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</div>
+
+<div id="toast">
+  <svg class="toast-icon" viewBox="0 0 24 24" id="toastIcon"></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+
+const CVE_DATA = [
+  {cve:'CVE-2026-1281',vendor:'Ivanti',product:'EPMM / MobileIron',cvss:9.8,severity:'CRITICAL',type:'RCE',status:'KEV',
+   desc:'Unauthenticated remote code execution in Ivanti Endpoint Manager Mobile (EPMM) API endpoint. Actively exploited in the wild targeting government and enterprise MDM deployments. CISA added to KEV catalog Jan 29, 2026.',
+   affected:'EPMM v11.10, v11.11, v11.12 — all editions',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Upgrade EPMM to v11.12.0.1 or later immediately','Block internet-facing EPMM API (port 443) at perimeter firewall','Review authentication logs for anomalous API calls since Jan 1, 2026','Enable MFA on all EPMM admin accounts','Check for indicators of compromise per CISA advisory AA26-030A'],
+   refs:['CISA KEV AA26-030A','NVD CVE-2026-1281','Ivanti Security Advisory']},
+
+  {cve:'CVE-2026-21536',vendor:'Microsoft',product:'Windows CLFS',cvss:9.8,severity:'CRITICAL',type:'EoP',status:'KEV',
+   desc:'Elevation of privilege in Windows Common Log File System (CLFS) driver. Exploited in ransomware campaigns post-March Patch Tuesday. Allows SYSTEM-level privilege from low-privileged user context.',
+   affected:'Windows 10/11, Windows Server 2019/2022/2025',vector:'AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Apply March 2026 Patch Tuesday cumulative update (KB5035853)','Enable Exploit Guard rules via Microsoft Defender','Monitor Windows Event ID 4688 for anomalous SYSTEM process spawning','Restrict CLFS driver access via AppLocker','Validate patch deployment across all Windows endpoints'],
+   refs:['MS Security Update Guide Mar 2026','CISA KEV','NVD']},
+
+  {cve:'CVE-2026-0075',vendor:'Palo Alto Networks',product:'PAN-OS NGFW',cvss:9.3,severity:'CRITICAL',type:'Auth Bypass',status:'KEV',
+   desc:'Authentication bypass in PAN-OS GlobalProtect gateway allows unauthenticated threat actors to gain full administrative access. Affects Palo Alto firewalls running affected versions. Actively exploited in targeted attacks against enterprise firewalls.',
+   affected:'PAN-OS 10.2.x < 10.2.9, 11.0.x < 11.0.6, 11.1.x < 11.1.3',vector:'AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N',
+   steps:['Upgrade PAN-OS to 10.2.9+, 11.0.6+, or 11.1.3+ immediately','Disable GlobalProtect if not required','Enable Threat Prevention on management interface','Check admin audit logs for unauthorized access','Apply recommended PAN-OS hardening baseline'],
+   refs:['PAN-SA-2026-0002','CISA Alert AA26-045A','NVD CVE-2026-0075']},
+
+  {cve:'CVE-2026-0199',vendor:'Fortinet',product:'FortiGate / FortiOS',cvss:9.0,severity:'CRITICAL',type:'RCE',status:'Patch Available',
+   desc:'Stack-based buffer overflow in FortiOS SSL-VPN web management interface allows unauthenticated remote code execution. Exploits target SSL-VPN portals exposed to the internet.',
+   affected:'FortiOS 7.0.x < 7.0.14, 7.2.x < 7.2.8, 7.4.x < 7.4.4',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Upgrade FortiOS to patched versions immediately','Disable SSL-VPN management portal if not needed','Restrict management access to trusted IP ranges','Enable FortiGuard IPS signature for CVE-2026-0199','Review SSL-VPN logs for exploitation indicators'],
+   refs:['FortiGuard PSIRT FG-IR-26-010','NVD','CISA Advisory']},
+
+  {cve:'CVE-2026-21262',vendor:'Microsoft',product:'SQL Server',cvss:8.8,severity:'HIGH',type:'RCE',status:'Public PoC',
+   desc:'Remote code execution vulnerability in Microsoft SQL Server via a specially crafted database connection. Affects linked server connections and triggers. PoC published on GitHub.',
+   affected:'SQL Server 2019 CU27, 2022 CU11 and earlier',vector:'AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Apply March 2026 SQL Server cumulative update','Restrict SQL Server network access to application servers only','Disable linked server connections if unused','Enable SQL Server Audit for failed logins','Monitor for unusual EXECUTE xp_cmdshell activity'],
+   refs:['MS Security Update Guide','NVD','CVE Details']},
+
+  {cve:'CVE-2026-26110',vendor:'Microsoft',product:'Office 365 / Word',cvss:8.4,severity:'HIGH',type:'RCE',status:'Patched',
+   desc:'Remote code execution via malicious Office documents exploitable through the Preview Pane. No user interaction beyond opening email preview required in Outlook.',
+   affected:'Microsoft 365 Apps, Office 2021, Office 2019 (all platforms)',vector:'AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H',
+   steps:['Apply Microsoft 365 update (build 16.0.17628+)','Disable Preview Pane in Outlook as interim mitigation','Block macro-enabled Office documents at email gateway','Enable Protected View for all Office documents','Deploy Attack Surface Reduction rules for Office'],
+   refs:['MS Security Update Mar 2026','MSRC Blog','NVD']},
+
+  {cve:'CVE-2026-3342',vendor:'WatchGuard',product:'Fireware / Firebox',cvss:8.6,severity:'HIGH',type:'RCE',status:'EoL Unpatched',
+   desc:'Remote code execution in WatchGuard Fireware HTTPS management interface. End-of-life Firebox T-series appliances will not receive patches. Active exploitation attempts observed.',
+   affected:'Fireware 12.9.x, 12.8.x (T10/T20/T40 EoL models)',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Upgrade Fireware to 12.10.1+ on supported models','Retire EoL T10/T20/T40 appliances immediately','Restrict management interface access to OOB network only','Deploy IPS signatures for CVE-2026-3342','Consider hardware refresh to M290 or M390 series'],
+   refs:['WatchGuard Security Advisory WSA-2026-07','NVD','CISA Advisory']},
+
+  {cve:'CVE-2026-0441',vendor:'Cisco',product:'IOS XE / Catalyst',cvss:8.6,severity:'HIGH',type:'Auth Bypass',status:'Patched',
+   desc:'Authentication bypass in Cisco IOS XE web UI allows unauthenticated remote attacker to gain admin-level access. Affects Catalyst 9000 series and ISR routers.',
+   affected:'IOS XE 17.9.x < 17.9.4a, 17.12.x < 17.12.2',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N',
+   steps:['Upgrade to IOS XE 17.9.4a or 17.12.2 immediately','Disable HTTP server on IOS XE: no ip http server','Restrict management to dedicated OOB network','Enable AAA accounting for all management sessions','Review Cisco TAC advisory for IoC signatures'],
+   refs:['Cisco Advisory cisco-sa-iosxe-auth-2026','NVD','CISA KEV']},
+
+  {cve:'CVE-2026-0812',vendor:'VMware',product:'vCenter Server',cvss:9.1,severity:'CRITICAL',type:'RCE',status:'Patched',
+   desc:'Heap overflow in vCenter Server DCERPC service allows unauthenticated remote code execution. Exploits target hypervisor management plane in enterprise data centers.',
+   affected:'vCenter 8.0 U3 < 8.0U3d, 7.0 U3 < 7.0U3r',vector:'AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H',
+   steps:['Apply VMware VMSA-2026-0005 patch immediately','Restrict vCenter management access to dedicated admin VLAN','Enable vCenter audit logging and SIEM integration','Review vCenter admin account list for unauthorized additions','Deploy VMware Carbon Black for vCenter host monitoring'],
+   refs:['VMware VMSA-2026-0005','NVD','CISA Advisory']},
+
+  {cve:'CVE-2026-0920',vendor:'Check Point',product:'Quantum Security Gateway',cvss:8.8,severity:'HIGH',type:'Path Traversal',status:'Patched',
+   desc:'Path traversal vulnerability in Check Point Quantum Security Gateway allows unauthenticated attacker to read sensitive configuration files including credentials.',
+   affected:'Gaia OS R81.20 < R81.20.10, R81.10 all builds',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N',
+   steps:['Apply Check Point Hotfix HF-R81.20.10 immediately','Reset all gateway admin credentials after patching','Review /var/log/SmartEvent for unauthorized file access','Enable IPS blade to block exploit attempts','Validate SSL certificate integrity on management interface'],
+   refs:['Check Point Advisory sk182332','NVD','CISA Advisory']},
+
+  {cve:'CVE-2026-1144',vendor:'Citrix',product:'NetScaler / ADC',cvss:8.9,severity:'HIGH',type:'Auth Bypass',status:'KEV',
+   desc:'Authentication bypass in Citrix NetScaler ADC management interface. Added to CISA KEV after confirmed exploitation in financial sector. Allows full admin access without credentials.',
+   affected:'NetScaler 14.1 < 14.1-21.57, 13.1 < 13.1-51.15',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N',
+   steps:['Upgrade NetScaler to 14.1-21.57 or 13.1-51.15 immediately','Restrict NSIP management access to trusted admin IPs','Rotate all NetScaler admin credentials post-patching','Enable Citrix WAF protection rules','Review ADC audit logs for unauthorized admin access'],
+   refs:['Citrix Security Bulletin CTX670493','CISA KEV','NVD']},
+
+  {cve:'CVE-2026-3630',vendor:'Delta Electronics',product:'COMMGR2 / DIAEnergie',cvss:9.8,severity:'CRITICAL',type:'RCE',status:'OT Zero-Day',
+   desc:'Stack-based buffer overflow in Delta Electronics COMMGR2 industrial communication gateway. Allows unauthenticated RCE targeting OT/ICS environments. CISA ICS advisory ICSA-26-084-01 published.',
+   affected:'COMMGR2 v1.3.2 and earlier, DIAEnergie v1.9.02 and earlier',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Upgrade COMMGR2 to v1.3.3 or apply Delta patch','Isolate COMMGR2 hosts in dedicated OT DMZ segment','Block external access to TCP port 5450 (COMMGR2 default)','Enable network anomaly detection for OT segment','Report exploitation attempts to CISA via CIRCIA'],
+   refs:['CISA ICSA-26-084-01','Delta Electronics Advisory','NVD']},
+
+  {cve:'CVE-2026-4102',vendor:'Apache',product:'Tomcat',cvss:7.5,severity:'HIGH',type:'SSRF',status:'Patched',
+   desc:'Server-side request forgery in Apache Tomcat AJP connector allows attackers to access internal network resources. Affects default AJP configurations.',
+   affected:'Tomcat 10.1.x < 10.1.19, 9.0.x < 9.0.86',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N',
+   steps:['Upgrade Tomcat to 10.1.19 or 9.0.86','Disable AJP connector if not required (server.xml)','Restrict AJP to localhost only if required','Enable Tomcat access logging for all requests','Review application for SSRF-exploitable endpoints'],
+   refs:['Apache Security Advisory','NVD','CERT Coordination Center']},
+
+  {cve:'CVE-2026-2251',vendor:'GitLab',product:'GitLab CE/EE',cvss:8.7,severity:'HIGH',type:'Auth Bypass',status:'Patched',
+   desc:'Authentication bypass in GitLab OAuth2 flow allows account takeover without user interaction. Affects all GitLab installations with OAuth enabled.',
+   affected:'GitLab 16.10.x < 16.10.2, 16.9.x < 16.9.5',vector:'AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N',
+   steps:['Upgrade GitLab to 16.10.2 or 16.9.5 immediately','Review OAuth application list for unauthorized apps','Reset all OAuth tokens and force re-authentication','Enable 2FA requirement for all GitLab accounts','Audit GitLab admin access logs for Jan–Mar 2026'],
+   refs:['GitLab Security Release Blog','NVD','HackerOne']},
+
+  {cve:'CVE-2026-1890',vendor:'SolarWinds',product:'Orion Platform',cvss:8.4,severity:'HIGH',type:'SQLi',status:'Patched',
+   desc:'SQL injection in SolarWinds Orion Platform allows authenticated low-privilege user to escalate to admin and execute arbitrary queries against the Orion database.',
+   affected:'Orion Platform 2023.4 and earlier',vector:'AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Apply SolarWinds Orion hotfix 2023.4.1 immediately','Restrict Orion web console to admin VLAN','Enable SQL Server Extended Events for Orion DB monitoring','Review Orion user account list for unauthorized additions','Rotate Orion service account passwords'],
+   refs:['SolarWinds PSIRT Advisory SWPSA-2026-005','NVD','CISA']},
+
+  {cve:'CVE-2026-3009',vendor:'Juniper',product:'Junos OS / SRX Series',cvss:8.1,severity:'HIGH',type:'RCE',status:'Patched',
+   desc:'Memory corruption in Juniper Junos OS J-Web interface allows unauthenticated remote code execution targeting SRX firewalls and EX switches with J-Web enabled.',
+   affected:'Junos OS 22.4 < 22.4R3-S2, 23.2 < 23.2R1-S1',vector:'AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Apply Junos OS patches JSA82908','Disable J-Web if not required','Restrict J-Web to OOB management network only','Enable BGP FlowSpec filtering for anomalous traffic','Review Junos syslog for unauthorized J-Web access'],
+   refs:['Juniper JSA82908','NVD','CISA Advisory']},
+
+  {cve:'CVE-2026-5512',vendor:'CrowdStrike',product:'Falcon Sensor',cvss:7.8,severity:'HIGH',type:'LPE',status:'Patched',
+   desc:'Local privilege escalation in CrowdStrike Falcon sensor kernel driver allows low-privileged local attacker to gain SYSTEM/root privileges on Windows/Linux endpoints.',
+   affected:'Falcon Sensor for Windows < 7.15, Linux < 7.13',vector:'AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Update Falcon sensor to 7.15 (Windows) or 7.13 (Linux)','Review endpoint privilege escalation alerts in Falcon console','Enforce least-privilege on user accounts','Enable kernel protection features in Falcon policy','Monitor for anomalous kernel driver load events'],
+   refs:['CrowdStrike Advisory CS-2026-0112','NVD']},
+
+  {cve:'CVE-2026-6001',vendor:'Splunk',product:'Splunk Enterprise',cvss:8.0,severity:'HIGH',type:'RCE',status:'Patched',
+   desc:'Deserialization vulnerability in Splunk Enterprise REST API allows authenticated attacker to achieve remote code execution on the Splunk indexer or search head.',
+   affected:'Splunk Enterprise 9.2.x < 9.2.1, 9.1.x < 9.1.4',vector:'AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H',
+   steps:['Upgrade Splunk Enterprise to 9.2.1 or 9.1.4','Restrict Splunk REST API access to admin IP ranges','Rotate Splunk admin and service account credentials','Enable Splunk Audit Activity monitoring','Review Splunk internal indexes for anomalous REST calls'],
+   refs:['Splunk Security Advisory SVD-2026-0301','NVD']}
+];
+
+// OT Advisory Data
+const OT_WEEK1 = [
+  {title:'Schneider Electric Modicon M340/M580',id:'ICSA-26-079-01',vendor:'Schneider Electric',cvss:9.8,severity:'critical',
+   type:'Remote Code Execution',product:'Modicon M340, M580, Quantum PLCs',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Improper input validation in Modicon EtherNet/IP stack allows unauthenticated RCE. Affects all firmware versions prior to SV3.60. CVSS vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H. Mitigate by upgrading firmware to SV3.60 and isolating PLCs in dedicated OT VLAN with strict ACLs.'},
+  {title:'Schneider Electric EcoStruxure Plant',id:'ICSA-26-079-02',vendor:'Schneider Electric',cvss:8.5,severity:'high',
+   type:'Auth Bypass',product:'EcoStruxure Plant Expert v22.x',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Authentication bypass in EcoStruxure Plant Expert REST API. Allows unauthenticated access to SCADA process data and control functions. Apply patch EP-v22.1.2 and restrict API to engineering workstation subnet.'},
+  {title:'Siemens SICAM A8000 Series',id:'ICSA-26-079-03',vendor:'Siemens',cvss:9.1,severity:'critical',
+   type:'Auth Bypass',product:'SICAM A8000 CP-8031, CP-8050',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Authentication bypass in SICAM A8000 webserver component. Full device access without credentials. Upgrade firmware to V05.30. Disable webserver access from untrusted networks.'},
+  {title:'Mitsubishi Electric CNC M700V/M80V',id:'ICSA-26-079-04',vendor:'Mitsubishi Electric',cvss:7.5,severity:'high',
+   type:'Denial of Service',product:'CNC M700V Series, M80V Series',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Buffer overflow in Mitsubishi CNC Ethernet communication causes DoS condition, requiring manual restart. Apply Mitsubishi patch MT-CNC-2026-004 and restrict Ethernet port 683 to engineering network.'},
+  {title:'Rockwell Automation FactoryTalk',id:'ICSA-26-079-05',vendor:'Rockwell Automation',cvss:8.5,severity:'high',
+   type:'Deserialization RCE',product:'FactoryTalk Diagnostics v6.20',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Unsafe deserialization in FactoryTalk Diagnostics allows authenticated RCE. Upgrade to v6.21 and enforce application whitelisting on HMI/SCADA workstations.'},
+  {title:'Automated Logic WebCTRL',id:'ICSA-26-079-06',vendor:'Automated Logic / Carrier',cvss:8.8,severity:'high',
+   type:'Path Traversal',product:'WebCTRL BAS Server 8.5.x',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Path traversal in WebCTRL Building Automation System allows unauthenticated file read including configuration and credential files. Upgrade to WebCTRL 8.5.1.2. Restrict port 8080 to BMS admin workstations.'},
+];
+
+const OT_WEEK2 = [
+  {title:'Trane Tracer SC/SC+ BMS Controller',id:'ICSA-26-068-02',vendor:'Trane Technologies',cvss:9.0,severity:'critical',
+   type:'RCE',product:'Tracer SC v4.10, SC+ v5.x',date:'Mar 9, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Unauthenticated RCE in Trane Tracer building management system HTTP server. Allows full control of HVAC systems. Apply Trane firmware TBT-2026-SC-01. Segment BMS controllers behind dedicated VLAN with deny-all ingress.'},
+  {title:'Siemens RUGGEDCOM ROS / RROS',id:'ICSA-26-068-03',vendor:'Siemens',cvss:8.6,severity:'high',
+   type:'Command Injection',product:'RUGGEDCOM ROS v5.5, RROS v5.2',date:'Mar 9, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Command injection in RUGGEDCOM web management allows admin-authenticated OS command execution. Upgrade to ROS 5.5.1 / RROS 5.2.1. Restrict management to OOB network.'},
+  {title:'Honeywell IQ4x Building Controller',id:'ICSA-26-068-01',vendor:'Honeywell',cvss:8.8,severity:'high',
+   type:'Path Traversal',product:'IQ4E, IQ4S, IQ4XCITE controllers',date:'Mar 9, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Path traversal allows unauthenticated read of configuration including plaintext credentials. Apply Honeywell patch HBT-2026-IQ4X-003. Isolate controllers from IT network.'},
+  {title:'Inductive Automation Ignition SCADA',id:'ICSA-26-068-04',vendor:'Inductive Automation',cvss:8.0,severity:'high',
+   type:'Auth Bypass',product:'Ignition v8.1.x < 8.1.42',date:'Mar 9, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Authentication bypass in Ignition SCADA gateway web interface. Upgrade to Ignition 8.1.42. Enable Ignition gateway network segmentation and restrict designer client connections.'},
+  {title:'Siemens SIDIS Prime Distribution',id:'ICSA-26-068-05',vendor:'Siemens',cvss:7.8,severity:'high',
+   type:'SQL Injection',product:'SIDIS Prime v4.0.x',date:'Mar 9, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'SQL injection in SIDIS Prime energy distribution management. Allows data exfiltration and manipulation. Apply Siemens SSA-226945. Restrict database port 1433 to SIDIS application server.'},
+  {title:'Ceragon FibeAir IP-20 Microwave',id:'ICSA-26-068-06',vendor:'Ceragon Networks',cvss:7.5,severity:'high',
+   type:'Auth Bypass',product:'FibeAir IP-20C, IP-20E, IP-20S',date:'Mar 9, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Default credential bypass in Ceragon FibeAir management. Devices shipped with hardcoded admin credentials discoverable via brute force. Apply firmware patch F3. Change default credentials immediately.'},
+];
+
+const OT_CVE_SPECIFIC = [
+  {title:'Delta COMMGR2 Stack Overflow',id:'ICSA-26-084-01',vendor:'Delta Electronics',cvss:9.8,severity:'critical',
+   type:'Stack Overflow RCE',product:'COMMGR2 v1.3.2, DIAEnergie v1.9.02',date:'Mar 25, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Stack-based buffer overflow in Delta COMMGR2 industrial gateway. Unauthenticated RCE. Apply Delta firmware v1.3.3. Block TCP port 5450 at OT/IT boundary firewall. Reference CVE-2026-3630.'},
+  {title:'ABB AC500 PLC Programming Interface',id:'ICSA-26-080-01',vendor:'ABB',cvss:9.0,severity:'critical',
+   type:'Code Injection',product:'AC500 PLC v3.x < v3.3.7',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Code injection via malicious IEC 61131-3 program download to ABB AC500 PLC. Upgrade to AC500 firmware v3.3.7. Restrict programming access to authorized engineering workstations only.'},
+  {title:'GE Vernova Mark VIe Control System',id:'ICSA-26-082-01',vendor:'GE Vernova',cvss:8.4,severity:'high',
+   type:'Auth Bypass',product:'Mark VIe Turbine Controller',date:'Mar 22, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Authentication bypass in GE Vernova Mark VIe control system allows unauthorized command injection to turbine control loops. Apply GE patch VSRT-2026-001. Network-segment turbine controllers with strict ACLs.'},
+  {title:'Emerson DeltaV Distributed Control',id:'ICSA-26-077-01',vendor:'Emerson',cvss:8.2,severity:'high',
+   type:'Privilege Escalation',product:'DeltaV v14.3.x DCS Workstation',date:'Mar 17, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Privilege escalation in DeltaV DCS operator workstation allows standard user to gain engineering-level access to control functions. Apply Emerson patch DV-2026-Q1. Enforce role-based access control and two-person integrity on critical changes.'},
+  {title:'Yokogawa CENTUM VP Plant DCS',id:'ICSA-26-075-02',vendor:'Yokogawa',cvss:7.9,severity:'high',
+   type:'Buffer Overflow',product:'CENTUM VP R6.09 and earlier',date:'Mar 15, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'Buffer overflow in Yokogawa CENTUM VP engineering station. Allows denial-of-service and potential code execution via specially crafted project files. Apply patch YSAR-2026-0003. Restrict project file sources to engineering network share.'},
+  {title:'Phoenix Contact PLCnext Technology',id:'ICSA-26-079-07',vendor:'Phoenix Contact',cvss:7.5,severity:'high',
+   type:'Remote Code Execution',product:'PLCnext AXC F 2152 v2023.9',date:'Mar 20, 2026',
+   cisaUrl:'https://www.cisa.gov/ics-advisories',
+   detail:'RCE via PLCnext runtime OPC UA server. Unauthenticated attackers can upload malicious apps. Upgrade to firmware 2024.0. Disable OPC UA if not required. Implement certificate-based authentication.'},
+];
+
+// Timeline
+const TIMELINE_DATA = [
+  {date:'Jan 29, 2026',title:'Ivanti EPMM Zero-Day Added to CISA KEV',desc:'CVE-2026-1281 confirmed exploited in the wild targeting government MDM platforms. CISA issues emergency directive AA26-030A.',dot:'critical'},
+  {date:'Feb 5, 2026',title:'Palo Alto PAN-OS Auth Bypass Disclosed',desc:'CVE-2026-0075 disclosed affecting GlobalProtect gateway. Exploits observed in targeted attacks on enterprise firewalls.',dot:'critical'},
+  {date:'Feb 18, 2026',title:'Fortinet FortiGate SSL-VPN RCE',desc:'CVE-2026-0199 buffer overflow in SSL-VPN web interface. Fortinet releases emergency patch for FortiOS 7.x.',dot:'high'},
+  {date:'Mar 3, 2026',title:'Citrix NetScaler Auth Bypass — KEV Listed',desc:'CVE-2026-1144 added to CISA KEV after exploitation confirmed in financial sector organizations.',dot:'critical'},
+  {date:'Mar 9, 2026',title:'CISA ICS Advisory Week AV26-241',desc:'6 ICS advisories published: Trane Tracer SC, Siemens RUGGEDCOM, Honeywell IQ4x, Inductive Automation Ignition, SIDIS Prime, Ceragon FibeAir.',dot:'ot'},
+  {date:'Mar 10, 2026',title:'Microsoft Patch Tuesday — March 2026',desc:'147 CVEs patched including CVE-2026-21536 (Windows CLFS EoP) and CVE-2026-21262 (SQL Server RCE). Multiple KEV additions.',dot:'info'},
+  {date:'Mar 17, 2026',title:'Cisco IOS XE Authentication Bypass',desc:'CVE-2026-0441 affecting Catalyst 9000 series disclosed. Cisco releases emergency fix. CISA issues advisory.',dot:'high'},
+  {date:'Mar 20, 2026',title:'CISA ICS Advisory Week AV26-265',desc:'6 ICS advisories: Schneider Electric Modicon/EcoStruxure, Siemens SICAM, Mitsubishi CNC, Rockwell FactoryTalk, Automated Logic WebCTRL, Rockwell FactoryTalk.',dot:'ot'},
+  {date:'Mar 22, 2026',title:'VMware vCenter Heap Overflow',desc:'CVE-2026-0812 RCE in vCenter DCERPC service. VMware VMSA-2026-0005 released. Emergency patching required for all vCenter deployments.',dot:'critical'},
+  {date:'Mar 25, 2026',title:'Delta COMMGR2 ICS Zero-Day',desc:'CVE-2026-3630 CVSS 9.8 stack overflow in Delta Electronics COMMGR2 industrial gateway. CISA ICSA-26-084-01 published. OT environments at risk.',dot:'ot'},
+  {date:'Mar 25, 2026',title:'CISA Intune Hardening Alert',desc:'CISA issues hardening guidance for Microsoft Intune after Stryker Healthcare breach. Recommends conditional access policies and device compliance enforcement.',dot:'info'},
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let currentFilter = 'ALL';
+let currentSort = {col:'cvss',asc:false};
+let searchTerm = '';
+let chartsBuilt = false;
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderCveTable();
+  renderAdvisories();
+  renderTimeline();
+  buildCharts();
+  updateCount();
+
+  const inp = document.getElementById('globalSearch');
+  inp.addEventListener('input', () => {
+    searchTerm = inp.value.trim().toLowerCase();
+    document.getElementById('searchClear').style.display = searchTerm ? 'block' : 'none';
+    if (searchTerm) {
+      showPage('it-vulns', document.querySelector('[onclick*="it-vulns"]'));
+    }
+    renderCveTable();
+  });
+
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Escape') clearSearch();
+  });
+});
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  const titles = {
+    'overview': 'Overview',
+    'it-vulns': 'IT Vulnerabilities',
+    'ot-ics': 'OT / ICS Advisories',
+    'timeline-pg': 'Activity Timeline'
+  };
+  document.getElementById('pageTitle').textContent = titles[id] || id;
+  closePanel();
+}
+
+// ═══════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  const btn = document.getElementById('themeBtn');
+  btn.innerHTML = isDark
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  if (!isDark) buildCharts();
+}
+
+// ═══════════════════════════════════════════
+//  SYNC
+// ═══════════════════════════════════════════
+function doSync() {
+  const btn = document.getElementById('syncBtn');
+  if (btn.classList.contains('syncing')) return;
+  btn.classList.add('syncing');
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Syncing…';
+  setTimeout(() => {
+    const now = new Date();
+    const t = now.getUTCHours().toString().padStart(2,'0') + ':' + now.getUTCMinutes().toString().padStart(2,'0') + ' UTC';
+    document.getElementById('syncTime').textContent = t;
+    btn.classList.remove('syncing');
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Sync Now';
+    showToast('success', 'Feeds synced — ' + t);
+  }, 2200);
+}
+
+// ═══════════════════════════════════════════
+//  SEARCH
+// ═══════════════════════════════════════════
+function clearSearch() {
+  const inp = document.getElementById('globalSearch');
+  inp.value = '';
+  searchTerm = '';
+  document.getElementById('searchClear').style.display = 'none';
+  renderCveTable();
+}
+
+// ═══════════════════════════════════════════
+//  FILTER + SORT
+// ═══════════════════════════════════════════
+function filterByChip(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('#filterRow .chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    document.querySelectorAll('#filterRow .chip').forEach(c => {
+      if (c.textContent.trim().toUpperCase().includes(filter)) c.classList.add('active');
+    });
+  }
+  renderCveTable();
+}
+
+function sortTable(col) {
+  if (currentSort.col === col) currentSort.asc = !currentSort.asc;
+  else { currentSort.col = col; currentSort.asc = false; }
+  renderCveTable();
+}
+
+// ═══════════════════════════════════════════
+//  CVE TABLE
+// ═══════════════════════════════════════════
+function getFilteredData() {
+  let data = [...CVE_DATA];
+  if (currentFilter === 'KEV') data = data.filter(d => d.status === 'KEV');
+  else if (currentFilter === 'CRITICAL') data = data.filter(d => d.severity === 'CRITICAL');
+  else if (currentFilter === 'HIGH') data = data.filter(d => d.severity === 'HIGH');
+  else if (currentFilter === 'MEDIUM') data = data.filter(d => d.severity === 'MEDIUM');
+
+  if (searchTerm) {
+    data = data.filter(d =>
+      d.cve.toLowerCase().includes(searchTerm) ||
+      d.vendor.toLowerCase().includes(searchTerm) ||
+      d.product.toLowerCase().includes(searchTerm) ||
+      d.type.toLowerCase().includes(searchTerm) ||
+      d.severity.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  data.sort((a,b) => {
+    let av = a[currentSort.col], bv = b[currentSort.col];
+    if (typeof av === 'string') av = av.toLowerCase(), bv = bv.toLowerCase();
+    if (av < bv) return currentSort.asc ? -1 : 1;
+    if (av > bv) return currentSort.asc ? 1 : -1;
+    return 0;
+  });
+  return data;
+}
+
+function highlight(text, term) {
+  if (!term) return escHtml(text);
+  const re = new RegExp('(' + escRe(term) + ')', 'gi');
+  return escHtml(text).replace(re, '<mark class="highlight">$1</mark>');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escRe(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+}
+
+function renderCveTable() {
+  const data = getFilteredData();
+  const tbody = document.getElementById('cveBody');
+  updateCount(data.length);
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="no-results">No vulnerabilities match the current filter or search.</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map((d,i) => {
+    const sc = d.severity.toLowerCase();
+    const stBadge = d.status === 'KEV' ? '<span class="badge badge-kev">KEV</span>' :
+      d.status === 'OT Zero-Day' ? '<span class="badge badge-ot">OT 0-day</span>' :
+      d.status === 'EoL Unpatched' ? '<span class="badge" style="background:var(--red-dim);color:var(--red)">EoL ⚠</span>' :
+      d.status === 'Public PoC' ? '<span class="badge" style="background:var(--orange-dim);color:var(--orange)">PoC Public</span>' :
+      '<span class="badge badge-it">' + escHtml(d.status) + '</span>';
+    return `<tr class="data-row" onclick="openPanel(${i})">
+      <td class="cve-id">${highlight(d.cve,searchTerm)}</td>
+      <td>${highlight(d.vendor,searchTerm)}</td>
+      <td>${highlight(d.product,searchTerm)}</td>
+      <td><strong style="color:${d.cvss>=9?'var(--red)':d.cvss>=7?'var(--orange)':'var(--yellow)'}">${d.cvss}</strong></td>
+      <td><span class="badge badge-${sc}">${d.severity}</span></td>
+      <td>${highlight(d.type,searchTerm)}</td>
+      <td>${stBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateCount(n) {
+  const el = document.getElementById('itCount');
+  if (el) el.textContent = n !== undefined ? `(${n} shown)` : `(${CVE_DATA.length} total)`;
+}
+
+// ═══════════════════════════════════════════
+//  DETAIL PANEL
+// ═══════════════════════════════════════════
+function openPanel(idx) {
+  const d = getFilteredData()[idx];
+  if (!d) return;
+  document.getElementById('panelCveId').textContent = d.cve;
+  document.getElementById('panelTitle').textContent = d.vendor + ' — ' + d.product;
+
+  const sc = d.severity.toLowerCase();
+  document.getElementById('panelBody').innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-title">Overview</div>
+      <div class="panel-field"><span class="panel-field-label">Severity</span><span class="panel-field-val"><span class="badge badge-${sc}">${d.severity}</span></span></div>
+      <div class="panel-field"><span class="panel-field-label">CVSS Score</span><span class="panel-field-val" style="color:${d.cvss>=9?'var(--red)':d.cvss>=7?'var(--orange)':'var(--yellow)'}"><strong>${d.cvss}</strong> / 10</span></div>
+      <div class="panel-field"><span class="panel-field-label">Type</span><span class="panel-field-val">${escHtml(d.type)}</span></div>
+      <div class="panel-field"><span class="panel-field-label">Status</span><span class="panel-field-val">${escHtml(d.status)}</span></div>
+      <div class="panel-field"><span class="panel-field-label">Vector</span><span class="panel-field-val" style="font-family:monospace;font-size:11px">${escHtml(d.vector)}</span></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Affected Systems</div>
+      <div class="panel-desc">${escHtml(d.affected)}</div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Description</div>
+      <div class="panel-desc">${escHtml(d.desc)}</div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Mitigation Steps</div>
+      <ul class="step-list">${d.steps.map((s,i)=>`<li><span class="step-num">${i+1}</span><span>${escHtml(s)}</span></li>`).join('')}</ul>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">References</div>
+      <div>${d.refs.map(r=>`<span class="ref-link">${escHtml(r)}</span>`).join('')}</div>
+    </div>`;
+
+  document.querySelectorAll('.data-row').forEach(r => r.classList.remove('selected'));
+  const rows = document.querySelectorAll('.data-row');
+  if (rows[idx]) rows[idx].classList.add('selected');
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.querySelectorAll('.data-row').forEach(r => r.classList.remove('selected'));
+}
+
+// ═══════════════════════════════════════════
+//  OT ADVISORIES
+// ═══════════════════════════════════════════
+function switchOtTab(n) {
+  for (let i=0; i<3; i++) {
+    document.getElementById('otTab'+i).classList.toggle('active', i===n);
+    document.getElementById('otPanel'+i).classList.toggle('active', i===n);
+  }
+}
+
+function renderAdvisories() {
+  renderAdvGrid('advGrid0', OT_WEEK1);
+  renderAdvGrid('advGrid1', OT_WEEK2);
+  renderAdvGrid('advGrid2', OT_CVE_SPECIFIC);
+}
+
+function renderAdvGrid(containerId, data) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = data.map((a, idx) => {
+    const sc = a.severity;
+    const icon = sc==='critical' ? '⚡' : sc==='high' ? '⚠' : '●';
+    return `
+    <div class="advisory-card" onclick="toggleAdvisory('${containerId}_${idx}', event)">
+      <div class="adv-head">
+        <div class="adv-icon ${sc}">${icon}</div>
+        <div class="adv-title-wrap">
+          <div class="adv-title">${escHtml(a.title)}</div>
+          <div class="adv-sub">${escHtml(a.id)} &bull; ${escHtml(a.date)}</div>
+        </div>
+        <span class="badge badge-${sc === 'critical' ? 'critical' : 'high'}" style="flex-shrink:0">${a.cvss}</span>
+      </div>
+      <div class="adv-body">
+        <div class="adv-row">
+          <span class="adv-row-label">Vendor</span>
+          <span class="adv-row-val">${escHtml(a.vendor)}</span>
+        </div>
+        <div class="adv-row">
+          <span class="adv-row-label">Product</span>
+          <span class="adv-row-val">${escHtml(a.product)}</span>
+        </div>
+        <div class="adv-row">
+          <span class="adv-row-label">Type</span>
+          <span class="adv-row-val">${escHtml(a.type)}</span>
+        </div>
+      </div>
+      <div class="adv-detail" id="${containerId}_${idx}">
+        <div class="adv-detail-text">${escHtml(a.detail)}</div>
+        <div class="adv-actions">
+          <a class="adv-btn adv-btn-cisa" href="${escHtml(a.cisaUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            ↗ CISA Advisory
+          </a>
+          <a class="adv-btn adv-btn-nvd" href="https://nvd.nist.gov/vuln/search/results?query=${encodeURIComponent(a.id)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            ↗ NVD
+          </a>
+          <a class="adv-btn adv-btn-vendor" href="#" onclick="event.stopPropagation(); showToast('info','Opening vendor portal for ${escHtml(a.vendor)}...')">
+            ↗ Vendor
+          </a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAdvisory(id, event) {
+  if (event.target.closest('.adv-btn')) return;
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════
+//  TIMELINE
+// ═══════════════════════════════════════════
+function renderTimeline() {
+  const container = document.getElementById('timelineContainer');
+  container.innerHTML = TIMELINE_DATA.map(t => `
+    <div class="tl-item">
+      <div class="tl-dot ${escHtml(t.dot)}"></div>
+      <div class="tl-card">
+        <div class="tl-meta">
+          <span class="tl-date">${escHtml(t.date)}</span>
+          <span class="badge badge-${t.dot==='critical'?'critical':t.dot==='high'?'high':t.dot==='ot'?'ot':'it'}">${t.dot.toUpperCase()}</span>
+        </div>
+        <div class="tl-title">${escHtml(t.title)}</div>
+        <div class="tl-desc">${escHtml(t.desc)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  CHARTS
+// ═══════════════════════════════════════════
+let chartSeverity = null, chartDonut = null;
+
+function buildCharts() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const textColor = isDark ? '#94a3b8' : '#475569';
+
+  Chart.defaults.color = textColor;
+  Chart.defaults.borderColor = gridColor;
+
+  if (chartSeverity) chartSeverity.destroy();
+  if (chartDonut) chartDonut.destroy();
+
+  const ctx1 = document.getElementById('severityChart');
+  const ctx2 = document.getElementById('donutChart');
+  if (!ctx1 || !ctx2) return;
+
+  chartSeverity = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: ['Critical','High','Medium','Low'],
+      datasets: [{
+        label: 'CVEs',
+        data: [7, 11, 5, 2],
+        backgroundColor: ['rgba(239,68,68,0.8)','rgba(249,115,22,0.8)','rgba(234,179,8,0.8)','rgba(34,197,94,0.8)'],
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: textColor } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor }, beginAtZero: true }
+      }
+    }
+  });
+
+  chartDonut = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: ['IT Vulnerabilities','OT Advisories','ICS-Specific CVEs'],
+      datasets: [{
+        data: [18, 12, 6],
+        backgroundColor: ['rgba(59,130,246,0.8)','rgba(6,182,212,0.8)','rgba(168,85,247,0.8)'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: textColor, padding: 12, font: { size: 12 } } }
+      },
+      cutout: '65%'
+    }
+  });
+}
+
+// ═══════════════════════════════════════════
+//  EXPORT CSV
+// ═══════════════════════════════════════════
+function exportCSV() {
+  const data = getFilteredData();
+  const header = ['CVE ID','Vendor','Product','CVSS','Severity','Type','Status'];
+  const rows = data.map(d => [d.cve,d.vendor,d.product,d.cvss,d.severity,d.type,d.status].map(v => '"'+String(v).replace(/"/g,'""')+'"').join(','));
+  const csv = [header.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'zeroguard-cves-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('success', 'CSV exported — ' + data.length + ' records');
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+let toastTimer = null;
+function showToast(type, msg) {
+  const t = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  const txt = document.getElementById('toastMsg');
+  t.className = type;
+  txt.textContent = msg;
+  icon.innerHTML = type === 'success'
+    ? '<polyline points="20 6 9 17 4 12"/>'
+    : type === 'error'
+    ? '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'
+    : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// close panel on ESC
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePanel();
+});
+</script>
+</body>
+</html>
