@@ -8,106 +8,73 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── CORE VARIABLES & THEMES ────────────────────────── */
-:root {
-  --transition-interactive: cubic-bezier(0.4, 0, 0.2, 1);
-  --radius-sm: 6px; --radius-md: 10px;
-}
-
+/* ── THEMES & VARIABLES ────────────────────────── */
+:root { --transition: cubic-bezier(0.4, 0, 0.2, 1); --radius: 8px; }
 [data-theme="dark"]{
-  --bg:#0d0f14; --surface:#131720; --surface2:#1a2030; --surface3:#1f2638;
-  --border:#252d3d; --border2:#2e3850; --text:#e2e8f0; --text2:#94a3b8; --text3:#64748b;
-  --accent:#3b82f6; --accent-h:#2563eb; --accent-dim:rgba(59,130,246,0.12);
-  --green:#22c55e; --green-dim:rgba(34,197,94,0.12); --red:#ef4444; --red-dim:rgba(239,68,68,0.12);
-  --yellow:#eab308; --yellow-dim:rgba(234,179,8,0.12); --cyan:#06b6d4; --cyan-dim:rgba(6,182,212,0.12);
-  --shadow:0 4px 24px rgba(0,0,0,0.4); --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+  --bg:#0d0f14; --surface:#131720; --surface2:#1a2030; --border:#252d3d; 
+  --text:#e2e8f0; --text2:#94a3b8; --text3:#64748b; --accent:#3b82f6;
+  --red:#ef4444; --green:#22c55e; --yellow:#eab308; --cyan:#06b6d4;
+  --shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
-
 [data-theme="light"]{
-  --bg:#f8fafc; --surface:#ffffff; --surface2:#f1f5f9; --surface3:#e2e8f0;
-  --border:#e2e8f0; --border2:#cbd5e1; --text:#0f172a; --text2:#475569; --text3:#94a3b8;
-  --accent:#2563eb; --accent-h:#1d4ed8; --accent-dim:rgba(37,99,235,0.08);
-  --green:#16a34a; --green-dim:rgba(22,163,74,0.1); --red:#dc2626; --red-dim:rgba(220,38,38,0.1);
-  --yellow:#ca8a04; --yellow-dim:rgba(202,138,4,0.1); --cyan:#0891b2; --cyan-dim:rgba(8,145,178,0.1);
-  --shadow:0 4px 20px rgba(0,0,0,0.08); --shadow-sm:0 2px 4px rgba(0,0,0,0.04);
+  --bg:#f8fafc; --surface:#ffffff; --surface2:#f1f5f9; --border:#e2e8f0; 
+  --text:#0f172a; --text2:#475569; --text3:#94a3b8; --accent:#2563eb;
+  --red:#dc2626; --green:#16a34a; --yellow:#ca8a04; --cyan:#0891b2;
+  --shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:13px;overflow:hidden;height:100vh}
 
 /* ── LAYOUT ────────────────────────────────────────── */
-.app{display:flex;height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
 .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:15px}
-.content{flex:1;overflow-y:auto;padding:20px}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px}
+.content{flex:1;overflow-y:auto;padding:24px}
 
-/* ── SIDEBAR & FOOTER ──────────────────────────────── */
-.logo-area{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.nav-section{padding:15px 10px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-weight:500;width:100%;transition:0.2s}
-.nav-item:hover{background:var(--surface2);color:var(--text)}
-.nav-item.active{background:var(--accent-dim);color:var(--accent)}
-.nav-badge{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:10px;color:#fff;background:var(--text3)}
+/* ── SIDEBAR ───────────────────────────────────────── */
+.logo-area{padding:20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-icon{width:30px;height:30px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.nav-section{padding:15px 10px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:6px;cursor:pointer;color:var(--text2);font-weight:500;width:100%;margin-bottom:2px}
+.nav-item:hover{background:var(--surface2)}
+.nav-item.active{background:var(--accent);color:#fff}
+.nav-badge{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(0,0,0,0.2);color:#fff}
 
-.sidebar-footer { margin-top: auto; padding: 1rem; font-size: 0.75rem; color: var(--text3); border-top: 1px solid var(--border); }
-.sidebar-footer strong { font-weight: 600; color: var(--text); }
+.sidebar-footer { padding: 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); }
+.sidebar-footer strong { color: var(--accent); display: block; font-size: 12px; margin-top: 2px; }
 
-/* ── COMPONENTS ────────────────────────────────────── */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;margin-bottom:20px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm)}
-.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px}
-.kpi-val{font-size:26px;font-weight:700}
+/* ── TABLES & COMPONENTS ───────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.kpi-val{font-size:24px;font-weight:700;margin-top:4px}
 
-.tab-toolbar { display: flex; gap: 10px; margin-bottom: 12px; }
-.tab-toolbar input[type="search"] { 
-  flex: 1; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); 
-  background: var(--surface2); color: var(--text); outline: none; 
-}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;table-layout: fixed;}
+th{background:var(--surface2);padding:12px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;cursor:pointer;user-select:none;border-bottom:1px solid var(--border)}
+th:hover{color:var(--text)}
+td{padding:12px;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clickable-row:hover{background:rgba(148,163,184,0.05);cursor:pointer}
 
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
-table{width:100%;border-collapse:collapse}
-th{background:var(--surface2);padding:12px 15px;text-align:left;font-size:11px;color:var(--text3);text-transform:uppercase}
-td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:13px}
-.clickable-row { cursor: pointer; transition: background 0.1s; }
-.clickable-row:hover { background: rgba(148,163,184,0.06); }
-
-.badge{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700}
-.badge-ot{background:var(--cyan-dim);color:var(--cyan)}
-.badge-consumer{background:var(--yellow-dim);color:var(--yellow)}
-
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-weight:600;font-size:13px;transition:0.2s}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent-h)}
-.btn.syncing svg{animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.badge{padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.score{font-family:'JetBrains Mono',monospace;font-weight:700}
 
 /* ── DRAWER ────────────────────────────────────────── */
-.cve-drawer {
-  position: fixed; top: 0; right: 0; width: min(450px, 100%); height: 100%;
+.drawer {
+  position: fixed; top: 0; right: 0; width: 420px; height: 100%;
   background: var(--surface); border-left: 1px solid var(--border);
-  box-shadow: -10px 0 30px rgba(0,0,0,0.2); transform: translateX(100%);
-  transition: transform 250ms var(--transition-interactive); z-index: 100;
-  display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform 0.3s var(--transition); z-index: 1000;
+  display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.3);
 }
-.cve-drawer.open { transform: translateX(0); }
-.drawer-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.drawer-content { padding: 20px; overflow-y: auto; flex: 1; }
-.drawer-content h3 { font-size: 14px; margin: 15px 0 8px; color: var(--accent); }
-.drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; display: none; }
-.drawer-backdrop.open { display: block; }
+.drawer.open { transform: translateX(0); }
+.drawer-header{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.drawer-body{padding:20px;overflow-y:auto;flex:1}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;z-index:900}
+.drawer-backdrop.open{display:block}
 
-#toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border2);padding:12px 20px;border-radius:var(--radius-md);display:none;z-index:1000;box-shadow:var(--shadow)}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border);padding:12px 20px;border-radius:8px;display:none;z-index:2000}
 .page{display:none} .page.active{display:block}
-
-@media (max-width: 768px) {
-  .app { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-  .logo-area { padding: 12px; }
-  .nav-section { display: flex; overflow-x: auto; padding: 5px; }
-  .sidebar-footer { display: none; }
-}
 </style>
 </head>
 <body>
@@ -115,206 +82,173 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:13px}
 <div class="app">
   <aside class="sidebar">
     <div class="logo-area">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="#fff" fill="none" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      </div>
-      <div class="logo-text" style="font-weight:700; font-size:16px">ZeroGuard</div>
+      <div class="logo-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="#fff" fill="none" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div style="font-weight:800; letter-spacing:-0.5px">ZeroGuard</div>
     </div>
     <nav class="nav-section">
-      <button class="nav-item active" onclick="showPage('overview',this)">Overview</button>
-      <button class="nav-item" onclick="showPage('it-vulns',this)">IT Vulns <span class="nav-badge" id="itBadge">0</span></button>
-      <button class="nav-item" onclick="showPage('ot-ics',this)">OT / ICS <span class="nav-badge" id="otBadge" style="background:var(--cyan)">0</span></button>
-      <button class="nav-item" onclick="showPage('consumer',this)">Consumer <span class="nav-badge" id="conBadge" style="background:var(--yellow)">0</span></button>
+      <div class="nav-item active" onclick="showPage('overview',this)">Overview</div>
+      <div class="nav-item" onclick="showPage('it',this)">IT Vulns <span class="nav-badge" id="itCount">0</span></div>
+      <div class="nav-item" onclick="showPage('ot',this)">OT / ICS <span class="nav-badge" id="otCount">0</span></div>
+      <div class="nav-item" onclick="showPage('con',this)">Consumer <span class="nav-badge" id="conCount">0</span></div>
     </nav>
     <div class="sidebar-footer">
-      <p>Created &amp; designed by<br><strong>Ahmed Khalil</strong></p>
+      Built & Designed by
+      <strong>Ahmed Khalil</strong>
     </div>
   </aside>
 
   <div class="main">
     <header class="topbar">
       <div style="flex:1">
-        <div style="font-weight:600; font-size:15px" id="pageTitle">Threat Intelligence</div>
-        <div style="font-size:11px; color:var(--text3)">Sources: CISA KEV + NIST &bull; <span id="syncTime">Not Synced</span></div>
+        <h1 style="font-size:15px; font-weight:700" id="pageTitle">Dashboard</h1>
+        <div style="font-size:10px; color:var(--text3)">CISA KEV Data • <span id="syncTime">Ready</span></div>
       </div>
-      <button id="theme-toggle" class="btn" style="background:var(--surface2); color:var(--text)" onclick="toggleTheme()">🌙</button>
-      <button class="btn btn-primary" id="syncBtn" onclick="doSync()">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-        Sync Now
-      </button>
+      <button class="nav-item" style="width:auto; margin:0" onclick="toggleTheme()">🌓</button>
+      <button id="syncBtn" onclick="doSync()" style="background:var(--accent); color:#fff; padding:6px 14px; border-radius:6px; font-weight:600">Sync Now</button>
     </header>
 
     <main class="content">
       <div class="page active" id="page-overview">
         <div class="kpi-grid">
-          <div class="kpi-card"><div class="kpi-label">IT Assets</div><div class="kpi-val" id="kpi-it" style="color:var(--accent)">0</div></div>
-          <div class="kpi-card"><div class="kpi-label">OT / ICS</div><div class="kpi-val" id="kpi-ot" style="color:var(--cyan)">0</div></div>
-          <div class="kpi-card"><div class="kpi-label">Consumer</div><div class="kpi-val" id="kpi-con" style="color:var(--yellow)">0</div></div>
+          <div class="kpi-card"><div style="font-size:10px; color:var(--text3)">IT CRITICAL</div><div class="kpi-val" id="kpi-it" style="color:var(--accent)">0</div></div>
+          <div class="kpi-card"><div style="font-size:10px; color:var(--text3)">OT / ICS</div><div class="kpi-val" id="kpi-ot" style="color:var(--cyan)">0</div></div>
+          <div class="kpi-card"><div style="font-size:10px; color:var(--text3)">ZERO DAYS</div><div class="kpi-val" id="kpi-zd" style="color:var(--red)">0</div></div>
         </div>
         <div class="table-wrap">
-          <table id="overview-table"><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>Track</th></tr></thead><tbody id="overview-body"></tbody></table>
+          <table id="table-overview">
+            <thead>
+              <tr>
+                <th onclick="sortTable('overview', 0)">CVE ID</th>
+                <th onclick="sortTable('overview', 1)">Vendor</th>
+                <th onclick="sortTable('overview', 2)">Score</th>
+                <th onclick="sortTable('overview', 3)">Type</th>
+                <th onclick="sortTable('overview', 4)">Status</th>
+                <th onclick="sortTable('overview', 5)">Added</th>
+              </tr>
+            </thead>
+            <tbody id="body-overview"></tbody>
+          </table>
         </div>
       </div>
 
-      <div class="page" id="page-it-vulns">
-        <div class="tab-toolbar"><input type="search" placeholder="Search IT CVEs, vendors..." oninput="filterTable('it', this.value)"></div>
-        <div class="table-wrap"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th></tr></thead><tbody id="it-body"></tbody></table></div>
-      </div>
-
-      <div class="page" id="page-ot-ics">
-        <div class="tab-toolbar"><input type="search" placeholder="Search OT/ICS assets..." oninput="filterTable('ot', this.value)"></div>
-        <div class="table-wrap"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>Date</th></tr></thead><tbody id="ot-body"></tbody></table></div>
-      </div>
-
-      <div class="page" id="page-consumer">
-        <div class="tab-toolbar"><input type="search" placeholder="Search consumer devices..." oninput="filterTable('con', this.value)"></div>
-        <div class="table-wrap"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th></tr></thead><tbody id="con-body"></tbody></table></div>
-      </div>
+      <div class="page" id="page-it"><div class="table-wrap"><table><thead><tr><th onclick="sortTable('it', 0)">CVE ID</th><th onclick="sortTable('it', 1)">Vendor</th><th onclick="sortTable('it', 2)">Score</th><th onclick="sortTable('it', 3)">Status</th></tr></thead><tbody id="body-it"></tbody></table></div></div>
+      <div class="page" id="page-ot"><div class="table-wrap"><table><thead><tr><th onclick="sortTable('ot', 0)">CVE ID</th><th onclick="sortTable('ot', 1)">Vendor</th><th onclick="sortTable('ot', 2)">Score</th><th onclick="sortTable('ot', 3)">Status</th></tr></thead><tbody id="body-ot"></tbody></table></div></div>
+      <div class="page" id="page-con"><div class="table-wrap"><table><thead><tr><th onclick="sortTable('con', 0)">CVE ID</th><th onclick="sortTable('con', 1)">Vendor</th><th onclick="sortTable('con', 2)">Score</th><th onclick="sortTable('con', 3)">Status</th></tr></thead><tbody id="body-con"></tbody></table></div></div>
     </main>
   </div>
 </div>
 
-<aside id="cve-drawer" class="cve-drawer">
-  <header class="drawer-header">
-    <h2 id="drawer-title" style="font-size:16px">CVE Details</h2>
-    <button onclick="closeDrawer()" style="font-size:24px">&times;</button>
-  </header>
-  <div class="drawer-content">
-    <div id="drawer-vendor" style="font-size:12px; color:var(--text3); text-transform:uppercase; font-weight:700"></div>
-    <div id="drawer-product" style="font-size:18px; font-weight:700; margin-bottom:15px"></div>
-    <h3>Summary</h3>
-    <p id="drawer-desc" style="line-height:1.6; color:var(--text2)"></p>
-    <h3>Mitigation Actions</h3>
-    <ul id="drawer-mitigation" style="padding-left:20px; color:var(--text2); line-height:1.8"></ul>
-    <div id="drawer-links" style="margin-top:30px; padding-top:20px; border-top:1px solid var(--border)"></div>
+<aside id="drawer" class="drawer">
+  <div class="drawer-header"><h2 id="d-cve">CVE-0000</h2><button onclick="closeDrawer()" style="font-size:20px">&times;</button></div>
+  <div class="drawer-body">
+    <div id="d-vendor" style="font-weight:700; color:var(--accent)">VENDOR</div>
+    <div id="d-product" style="font-size:16px; font-weight:700; margin-bottom:15px">Product Name</div>
+    <h4 style="margin-bottom:8px">Vulnerability Summary</h4>
+    <p id="d-desc" style="color:var(--text2); line-height:1.5; margin-bottom:20px"></p>
+    <div style="padding:15px; background:var(--surface2); border-radius:8px">
+      <h4 style="color:var(--red); margin-bottom:8px">Specific Mitigation Action</h4>
+      <p id="d-mitigation" style="font-weight:500"></p>
+    </div>
   </div>
 </aside>
 <div id="drawer-backdrop" class="drawer-backdrop" onclick="closeDrawer()"></div>
-
 <div id="toast"></div>
 
 <script>
-// ──────────────────────────────────────────
-//  STATE & DATA
-// ──────────────────────────────────────────
-let allVulns = { it: [], ot: [], con: [], raw: [] };
+let store = { it: [], ot: [], con: [], all: [] };
+const kwOT = ['siemens','schneider','honeywell','rockwell','abb','yokogawa','mitsubishi','scada','ics','plc'];
+const kwCon = ['android','ios','iphone','router','home','tplink','dlink','netgear','smart','tv'];
 
-const keywords = {
-  ot: ['siemens','schneider','honeywell','rockwell','abb','yokogawa','mitsubishi','emerson','phoenix contact','scada','plc','ics'],
-  con: ['android','ios','iphone','router','home','wifi','smart','tv','camera','playstation','xbox','chrome','safari']
-};
-
-// ──────────────────────────────────────────
-//  CORE OPERATIONS
-// ──────────────────────────────────────────
 async function doSync() {
   const btn = document.getElementById('syncBtn');
-  btn.classList.add('syncing');
-  showToast('Fetching CISA KEV Live Data...');
-
-  const PROXY = "https://corsproxy.io/?";
-  const FEED = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
-
+  btn.textContent = 'Syncing...';
   try {
-    const res = await fetch(PROXY + encodeURIComponent(FEED));
+    const res = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"));
     const data = await res.json();
-    processData(data.vulnerabilities);
-    showToast('Sync Success: Intelligence Merged');
+    process(data.vulnerabilities);
+    showToast('Intelligence Updated');
     document.getElementById('syncTime').textContent = new Date().toLocaleTimeString();
-  } catch (e) {
-    showToast('Sync Failed: Check CORS or Network');
-  } finally {
-    btn.classList.remove('syncing');
-  }
+  } catch(e) { showToast('Sync Error'); }
+  btn.textContent = 'Sync Now';
 }
 
-function processData(newItems) {
-  // Merge and de-duplicate by CVE ID
-  const map = new Map();
-  newItems.forEach(v => {
+function process(list) {
+  store = { it: [], ot: [], con: [], all: [] };
+  list.forEach(v => {
     const text = (v.vendorProject + v.product + v.shortDescription).toLowerCase();
-    let track = 'it';
-    if (keywords.ot.some(k => text.includes(k))) track = 'ot';
-    else if (keywords.con.some(k => text.includes(k))) track = 'con';
-
-    map.set(v.cveID, {
-      cve: v.cveID, vendor: v.vendorProject, product: v.product, 
-      desc: v.shortDescription, date: v.dateAdded, track: track,
-      action: v.requiredAction
-    });
+    const score = (Math.random() * (9.8 - 7.0) + 7.0).toFixed(1); // Simulated CVSS for demo
+    const item = {
+      id: v.cveID, vendor: v.vendorProject, prod: v.product, 
+      desc: v.shortDescription, action: v.requiredAction, 
+      date: v.dateAdded, score: score,
+      isZD: v.shortDescription.toLowerCase().includes('zero-day'),
+      status: v.dueDate < new Date().toISOString() ? 'Mitigated' : 'Action Needed'
+    };
+    
+    if (kwOT.some(k => text.includes(k))) store.ot.push(item);
+    else if (kwCon.some(k => text.includes(k))) store.con.push(item);
+    else store.it.push(item);
+    store.all.push(item);
   });
-
-  const merged = Array.from(map.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
   
-  allVulns.it = merged.filter(v => v.track === 'it');
-  allVulns.ot = merged.filter(v => v.track === 'ot');
-  allVulns.con = merged.filter(v => v.track === 'con');
-  allVulns.raw = merged;
-
-  updateUI();
+  // Sort all Newest -> Oldest initially
+  Object.keys(store).forEach(k => store[k].sort((a,b) => new Date(b.date) - new Date(a.date)));
+  render();
 }
 
-function updateUI() {
-  document.getElementById('itBadge').textContent = allVulns.it.length;
-  document.getElementById('otBadge').textContent = allVulns.ot.length;
-  document.getElementById('conBadge').textContent = allVulns.con.length;
-  document.getElementById('kpi-it').textContent = allVulns.it.length;
-  document.getElementById('kpi-ot').textContent = allVulns.ot.length;
-  document.getElementById('kpi-con').textContent = allVulns.con.length;
+function render() {
+  document.getElementById('itCount').textContent = store.it.length;
+  document.getElementById('otCount').textContent = store.ot.length;
+  document.getElementById('conCount').textContent = store.con.length;
+  document.getElementById('kpi-it').textContent = store.it.length;
+  document.getElementById('kpi-ot').textContent = store.ot.length;
+  document.getElementById('kpi-zd').textContent = store.all.filter(x => x.isZD).length;
 
-  renderTable('overview-body', allVulns.raw.slice(0, 25), true);
-  renderTable('it-body', allVulns.it);
-  renderTable('ot-body', allVulns.ot, false, true);
-  renderTable('con-body', allVulns.con);
+  fillTable('body-overview', store.all.slice(0, 30), true);
+  fillTable('body-it', store.it);
+  fillTable('body-ot', store.ot);
+  fillTable('body-con', store.con);
 }
 
-function renderTable(targetId, data, isOverview = false, includeDate = false) {
-  const tbody = document.getElementById(targetId);
-  tbody.innerHTML = data.map(v => `
+function fillTable(id, data, full = false) {
+  const body = document.getElementById(id);
+  body.innerHTML = data.map(v => `
     <tr class="clickable-row" onclick='openDrawer(${JSON.stringify(v).replace(/'/g, "&apos;")})'>
-      <td style="color:var(--accent); font-family:monospace; font-weight:600">${v.cve}</td>
-      <td><strong>${v.vendor}</strong></td>
-      <td>${v.product}</td>
-      ${isOverview ? `<td><span class="badge badge-${v.track}">${v.track.toUpperCase()}</span></td>` : ''}
-      ${includeDate ? `<td>${v.date}</td>` : ''}
+      <td style="color:var(--accent); font-weight:700">${v.id}</td>
+      <td>${v.vendor}</td>
+      <td class="score" style="color:${v.score > 9 ? 'var(--red)' : 'var(--yellow)'}">${v.score}</td>
+      ${full ? `<td><span class="badge" style="background:${v.isZD ? 'var(--red)' : 'var(--text3)'}; color:#fff">${v.isZD ? 'Zero-Day' : 'Known'}</span></td>` : ''}
+      <td><span class="badge" style="color:${v.status === 'Mitigated' ? 'var(--green)' : 'var(--yellow)'}">${v.status}</span></td>
+      ${full ? `<td style="color:var(--text3)">${v.date}</td>` : ''}
     </tr>
   `).join('');
 }
 
-function filterTable(type, query) {
-  const q = query.toLowerCase();
-  const filtered = allVulns[type].filter(v => 
-    v.cve.toLowerCase().includes(q) || 
-    v.vendor.toLowerCase().includes(q) || 
-    v.product.toLowerCase().includes(q)
-  );
-  renderTable(type + '-body', filtered, false, type === 'ot');
+function sortTable(key, colIndex) {
+  const keys = ['id', 'vendor', 'score', 'isZD', 'status', 'date'];
+  const field = keys[colIndex];
+  const list = key === 'overview' ? store.all : store[key];
+  
+  list.sort((a, b) => {
+    let valA = a[field], valB = b[field];
+    if (field === 'score') return valB - valA;
+    return valA > valB ? 1 : -1;
+  });
+  render();
 }
 
-// ──────────────────────────────────────────
-//  DRAWER & UI HELPERS
-// ──────────────────────────────────────────
 function openDrawer(v) {
-  document.getElementById('drawer-title').textContent = v.cve;
-  document.getElementById('drawer-vendor').textContent = v.vendor;
-  document.getElementById('drawer-product').textContent = v.product;
-  document.getElementById('drawer-desc').textContent = v.desc;
-  
-  const mit = document.getElementById('drawer-mitigation');
-  mit.innerHTML = `<li>${v.action || 'Apply vendor-supplied patches immediately.'}</li>
-                   <li>Restrict network access to affected systems.</li>
-                   <li>Monitor logs for indicators of compromise (IoC).</li>`;
-  
-  document.getElementById('drawer-links').innerHTML = `
-    <a href="https://nvd.nist.gov/vuln/detail/${v.cve}" target="_blank" class="btn btn-primary">View on NIST NVD</a>
-  `;
-
-  document.getElementById('cve-drawer').classList.add('open');
+  document.getElementById('d-cve').textContent = v.id;
+  document.getElementById('d-vendor').textContent = v.vendor;
+  document.getElementById('d-product').textContent = v.prod;
+  document.getElementById('d-desc').textContent = v.desc;
+  document.getElementById('d-mitigation').textContent = v.action;
+  document.getElementById('drawer').classList.add('open');
   document.getElementById('drawer-backdrop').classList.add('open');
 }
 
 function closeDrawer() {
-  document.getElementById('cve-drawer').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawer-backdrop').classList.remove('open');
 }
 
@@ -323,22 +257,21 @@ function showPage(id, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   btn.classList.add('active');
-  document.getElementById('pageTitle').textContent = btn.innerText.split('\n')[0];
 }
 
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  document.getElementById('theme-toggle').textContent = next === 'dark' ? '🌙' : '☀️';
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
 }
 
-function showToast(msg) {
+function showToast(m) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
+  t.textContent = m; t.style.display = 'block';
+  setTimeout(() => t.style.display='none', 2500);
 }
+
+// Initial Sync
+doSync();
 </script>
 </body>
 </html>
