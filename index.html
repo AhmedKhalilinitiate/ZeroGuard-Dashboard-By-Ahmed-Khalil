@@ -8,75 +8,105 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
-body{font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
-button{cursor:pointer;border:none;background:none;font:inherit}
-input{font:inherit}
-table{border-collapse:collapse;width:100%}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
+/* ── CORE VARIABLES & THEMES ────────────────────────── */
+:root {
+  --transition-interactive: cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-sm: 6px; --radius-md: 10px;
+}
 
 [data-theme="dark"]{
   --bg:#0d0f14; --surface:#131720; --surface2:#1a2030; --surface3:#1f2638;
   --border:#252d3d; --border2:#2e3850; --text:#e2e8f0; --text2:#94a3b8; --text3:#64748b;
   --accent:#3b82f6; --accent-h:#2563eb; --accent-dim:rgba(59,130,246,0.12);
   --green:#22c55e; --green-dim:rgba(34,197,94,0.12); --red:#ef4444; --red-dim:rgba(239,68,68,0.12);
-  --orange:#f97316; --orange-dim:rgba(249,115,22,0.12); --yellow:#eab308; --yellow-dim:rgba(234,179,8,0.12);
-  --purple:#a855f7; --purple-dim:rgba(168,85,247,0.12); --cyan:#06b6d4; --cyan-dim:rgba(6,182,212,0.12);
+  --yellow:#eab308; --yellow-dim:rgba(234,179,8,0.12); --cyan:#06b6d4; --cyan-dim:rgba(6,182,212,0.12);
   --shadow:0 4px 24px rgba(0,0,0,0.4); --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
 }
 
-body{background:var(--bg);color:var(--text)}
+[data-theme="light"]{
+  --bg:#f8fafc; --surface:#ffffff; --surface2:#f1f5f9; --surface3:#e2e8f0;
+  --border:#e2e8f0; --border2:#cbd5e1; --text:#0f172a; --text2:#475569; --text3:#94a3b8;
+  --accent:#2563eb; --accent-h:#1d4ed8; --accent-dim:rgba(37,99,235,0.08);
+  --green:#16a34a; --green-dim:rgba(22,163,74,0.1); --red:#dc2626; --red-dim:rgba(220,38,38,0.1);
+  --yellow:#ca8a04; --yellow-dim:rgba(202,138,4,0.1); --cyan:#0891b2; --cyan-dim:rgba(8,145,178,0.1);
+  --shadow:0 4px 20px rgba(0,0,0,0.08); --shadow-sm:0 2px 4px rgba(0,0,0,0.04);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
+
+/* ── LAYOUT ────────────────────────────────────────── */
 .app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:15px}
 .content{flex:1;overflow-y:auto;padding:20px}
-.logo-area{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+
+/* ── SIDEBAR & FOOTER ──────────────────────────────── */
+.logo-area{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
-.nav-section{padding:12px 8px 4px}
-.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;width:100%;text-align:left}
+.nav-section{padding:15px 10px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-weight:500;width:100%;transition:0.2s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
 .nav-item.active{background:var(--accent-dim);color:var(--accent)}
-.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px}
+.nav-badge{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:10px;color:#fff;background:var(--text3)}
 
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:var(--shadow-sm)}
-.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
-.kpi-val{font-size:28px;font-weight:700}
+.sidebar-footer { margin-top: auto; padding: 1rem; font-size: 0.75rem; color: var(--text3); border-top: 1px solid var(--border); }
+.sidebar-footer strong { font-weight: 600; color: var(--text); }
 
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow-sm)}
-.cve-table{width:100%;font-size:13px}
-.cve-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border)}
-.cve-table td{padding:11px 14px;border-bottom:1px solid var(--border)}
-.cve-table tr:hover{background:rgba(148,163,184,0.06)}
+/* ── COMPONENTS ────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm)}
+.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px}
+.kpi-val{font-size:26px;font-weight:700}
 
-.badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
-.badge-critical{background:var(--red-dim);color:var(--red)}
+.tab-toolbar { display: flex; gap: 10px; margin-bottom: 12px; }
+.tab-toolbar input[type="search"] { 
+  flex: 1; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); 
+  background: var(--surface2); color: var(--text); outline: none; 
+}
+
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--surface2);padding:12px 15px;text-align:left;font-size:11px;color:var(--text3);text-transform:uppercase}
+td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:13px}
+.clickable-row { cursor: pointer; transition: background 0.1s; }
+.clickable-row:hover { background: rgba(148,163,184,0.06); }
+
+.badge{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700}
 .badge-ot{background:var(--cyan-dim);color:var(--cyan)}
 .badge-consumer{background:var(--yellow-dim);color:var(--yellow)}
 
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;transition:background 0.15s,color 0.15s,transform 0.1s}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-weight:600;font-size:13px;transition:0.2s}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent-h);transform:translateY(-1px)}
+.btn-primary:hover{background:var(--accent-h)}
 .btn.syncing svg{animation:spin 1s linear infinite}
-
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;z-index:9999;display:none;font-size:12px;color:var(--text2);box-shadow:var(--shadow)}
-.page{display:none}
-.page.active{display:block}
+/* ── DRAWER ────────────────────────────────────────── */
+.cve-drawer {
+  position: fixed; top: 0; right: 0; width: min(450px, 100%); height: 100%;
+  background: var(--surface); border-left: 1px solid var(--border);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.2); transform: translateX(100%);
+  transition: transform 250ms var(--transition-interactive); z-index: 100;
+  display: flex; flex-direction: column;
+}
+.cve-drawer.open { transform: translateX(0); }
+.drawer-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.drawer-content { padding: 20px; overflow-y: auto; flex: 1; }
+.drawer-content h3 { font-size: 14px; margin: 15px 0 8px; color: var(--accent); }
+.drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; display: none; }
+.drawer-backdrop.open { display: block; }
 
-.topbar-title{font-weight:600;font-size:15px;margin-bottom:2px}
-.footer-note{font-size:10px;color:var(--text3);text-align:center}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border2);padding:12px 20px;border-radius:var(--radius-md);display:none;z-index:1000;box-shadow:var(--shadow)}
+.page{display:none} .page.active{display:block}
 
-@media (max-width:768px){
-  .app{flex-direction:column}
-  .sidebar{width:100%;min-width:0;flex-direction:row;align-items:center;overflow-x:auto;height:60px}
-  .logo-area{border-bottom:none;border-right:1px solid var(--border);padding:10px 12px}
-  .nav-section{display:flex;gap:4px;padding:8px}
-  .sidebar-footer{display:none}
+@media (max-width: 768px) {
+  .app { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .logo-area { padding: 12px; }
+  .nav-section { display: flex; overflow-x: auto; padding: 5px; }
+  .sidebar-footer { display: none; }
 }
 </style>
 </head>
@@ -86,323 +116,228 @@ body{background:var(--bg);color:var(--text)}
   <aside class="sidebar">
     <div class="logo-area">
       <div class="logo-icon">
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="#fff" fill="none" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="#fff" fill="none" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       </div>
-      <div class="logo-text">ZeroGuard</div>
+      <div class="logo-text" style="font-weight:700; font-size:16px">ZeroGuard</div>
     </div>
-    <div class="nav-section">
+    <nav class="nav-section">
       <button class="nav-item active" onclick="showPage('overview',this)">Overview</button>
-      <button class="nav-item" onclick="showPage('it-vulns',this)">
-        IT Vulnerabilities
-        <span class="nav-badge" id="itCount">0</span>
-      </button>
-      <button class="nav-item" onclick="showPage('ot-ics',this)">
-        OT / ICS Advisories
-        <span class="nav-badge" id="otCount" style="background:var(--cyan)">0</span>
-      </button>
-      <button class="nav-item" onclick="showPage('consumer',this)">
-        Consumer Devices
-        <span class="nav-badge" id="consumerCount" style="background:var(--yellow)">0</span>
-      </button>
-    </div>
-    <div class="sidebar-footer" style="margin-top:auto; padding:12px; border-top:1px solid var(--border)">
-      <div class="footer-note">
-        Created &amp; Designed by
-        <span style="color:var(--accent); font-weight:600">Ahmed Khalil</span>
-      </div>
+      <button class="nav-item" onclick="showPage('it-vulns',this)">IT Vulns <span class="nav-badge" id="itBadge">0</span></button>
+      <button class="nav-item" onclick="showPage('ot-ics',this)">OT / ICS <span class="nav-badge" id="otBadge" style="background:var(--cyan)">0</span></button>
+      <button class="nav-item" onclick="showPage('consumer',this)">Consumer <span class="nav-badge" id="conBadge" style="background:var(--yellow)">0</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <p>Created &amp; designed by<br><strong>Ahmed Khalil</strong></p>
     </div>
   </aside>
 
   <div class="main">
     <header class="topbar">
       <div style="flex:1">
-        <div class="topbar-title">Threat Intelligence</div>
-        <div style="font-size:11px; color:var(--text3)">
-          Sources: CISA KEV + NIST • <span id="syncTime">Not Synced</span>
-        </div>
+        <div style="font-weight:600; font-size:15px" id="pageTitle">Threat Intelligence</div>
+        <div style="font-size:11px; color:var(--text3)">Sources: CISA KEV + NIST &bull; <span id="syncTime">Not Synced</span></div>
       </div>
+      <button id="theme-toggle" class="btn" style="background:var(--surface2); color:var(--text)" onclick="toggleTheme()">🌙</button>
       <button class="btn btn-primary" id="syncBtn" onclick="doSync()">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2">
-          <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-        </svg>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
         Sync Now
       </button>
     </header>
 
     <main class="content">
-      <!-- OVERVIEW -->
       <div class="page active" id="page-overview">
         <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Total Alerts</div>
-            <div class="kpi-val" id="kpi-total" style="color:var(--accent)">0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Critical (Est.)</div>
-            <div class="kpi-val" id="kpi-critical" style="color:var(--red)">0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">OT / ICS Assets</div>
-            <div class="kpi-val" id="kpi-ot" style="color:var(--cyan)">0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Consumer Devices</div>
-            <div class="kpi-val" id="kpi-consumer" style="color:var(--yellow)">0</div>
-          </div>
+          <div class="kpi-card"><div class="kpi-label">IT Assets</div><div class="kpi-val" id="kpi-it" style="color:var(--accent)">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">OT / ICS</div><div class="kpi-val" id="kpi-ot" style="color:var(--cyan)">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Consumer</div><div class="kpi-val" id="kpi-con" style="color:var(--yellow)">0</div></div>
         </div>
-
         <div class="table-wrap">
-          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
-            Aggregated Security Feed
-          </div>
-          <table class="cve-table">
-            <thead>
-              <tr>
-                <th>CVE ID</th>
-                <th>Vendor</th>
-                <th>Product</th>
-                <th>Track</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody id="overview-table"></tbody>
-          </table>
+          <table id="overview-table"><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>Track</th></tr></thead><tbody id="overview-body"></tbody></table>
         </div>
       </div>
 
-      <!-- IT VULNS -->
       <div class="page" id="page-it-vulns">
-        <div class="table-wrap">
-          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
-            IT Vulnerabilities
-          </div>
-          <table class="cve-table">
-            <thead>
-              <tr>
-                <th>CVE ID</th>
-                <th>Vendor</th>
-                <th>Product</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody id="it-table"></tbody>
-          </table>
-        </div>
+        <div class="tab-toolbar"><input type="search" placeholder="Search IT CVEs, vendors..." oninput="filterTable('it', this.value)"></div>
+        <div class="table-wrap"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th></tr></thead><tbody id="it-body"></tbody></table></div>
       </div>
 
-      <!-- OT / ICS -->
       <div class="page" id="page-ot-ics">
-        <div class="table-wrap">
-          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
-            OT / ICS Advisories
-          </div>
-          <table class="cve-table">
-            <thead>
-              <tr>
-                <th>CVE ID</th>
-                <th>Vendor</th>
-                <th>Product</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody id="ot-table"></tbody>
-          </table>
-        </div>
+        <div class="tab-toolbar"><input type="search" placeholder="Search OT/ICS assets..." oninput="filterTable('ot', this.value)"></div>
+        <div class="table-wrap"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>Date</th></tr></thead><tbody id="ot-body"></tbody></table></div>
       </div>
 
-      <!-- CONSUMER DEVICES -->
       <div class="page" id="page-consumer">
-        <div class="table-wrap">
-          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
-            Consumer / Everyday Devices
-          </div>
-          <table class="cve-table">
-            <thead>
-              <tr>
-                <th>CVE ID</th>
-                <th>Vendor</th>
-                <th>Product</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody id="consumer-table"></tbody>
-          </table>
-        </div>
+        <div class="tab-toolbar"><input type="search" placeholder="Search consumer devices..." oninput="filterTable('con', this.value)"></div>
+        <div class="table-wrap"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th></tr></thead><tbody id="con-body"></tbody></table></div>
       </div>
-
     </main>
   </div>
 </div>
+
+<aside id="cve-drawer" class="cve-drawer">
+  <header class="drawer-header">
+    <h2 id="drawer-title" style="font-size:16px">CVE Details</h2>
+    <button onclick="closeDrawer()" style="font-size:24px">&times;</button>
+  </header>
+  <div class="drawer-content">
+    <div id="drawer-vendor" style="font-size:12px; color:var(--text3); text-transform:uppercase; font-weight:700"></div>
+    <div id="drawer-product" style="font-size:18px; font-weight:700; margin-bottom:15px"></div>
+    <h3>Summary</h3>
+    <p id="drawer-desc" style="line-height:1.6; color:var(--text2)"></p>
+    <h3>Mitigation Actions</h3>
+    <ul id="drawer-mitigation" style="padding-left:20px; color:var(--text2); line-height:1.8"></ul>
+    <div id="drawer-links" style="margin-top:30px; padding-top:20px; border-top:1px solid var(--border)"></div>
+  </div>
+</aside>
+<div id="drawer-backdrop" class="drawer-backdrop" onclick="closeDrawer()"></div>
 
 <div id="toast"></div>
 
 <script>
 // ──────────────────────────────────────────
-//  CORE OPERATIONS ENGINE (CISA KEV)
+//  STATE & DATA
 // ──────────────────────────────────────────
+let allVulns = { it: [], ot: [], con: [], raw: [] };
 
+const keywords = {
+  ot: ['siemens','schneider','honeywell','rockwell','abb','yokogawa','mitsubishi','emerson','phoenix contact','scada','plc','ics'],
+  con: ['android','ios','iphone','router','home','wifi','smart','tv','camera','playstation','xbox','chrome','safari']
+};
+
+// ──────────────────────────────────────────
+//  CORE OPERATIONS
+// ──────────────────────────────────────────
 async function doSync() {
   const btn = document.getElementById('syncBtn');
-  if (!btn) return;
   btn.classList.add('syncing');
-  btn.disabled = true;
-  showToast('Connecting to CISA KEV feed...');
+  showToast('Fetching CISA KEV Live Data...');
 
   const PROXY = "https://corsproxy.io/?";
-  const CISA_KEV = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
+  const FEED = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
 
   try {
-    const response = await fetch(PROXY + encodeURIComponent(CISA_KEV));
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    const data = await response.json();
-    if (!data || !Array.isArray(data.vulnerabilities)) throw new Error('Unexpected KEV format');
-
-    processIntelligence(data.vulnerabilities);
-    document.getElementById('syncTime').textContent =
-      'Last sync: ' + new Date().toLocaleTimeString();
-    showToast('Success: Live KEV data aggregated.');
-  } catch (err) {
-    console.error(err);
-    showToast('Sync error: CISA KEV feed not reachable in this environment.');
+    const res = await fetch(PROXY + encodeURIComponent(FEED));
+    const data = await res.json();
+    processData(data.vulnerabilities);
+    showToast('Sync Success: Intelligence Merged');
+    document.getElementById('syncTime').textContent = new Date().toLocaleTimeString();
+  } catch (e) {
+    showToast('Sync Failed: Check CORS or Network');
   } finally {
     btn.classList.remove('syncing');
-    btn.disabled = false;
   }
 }
 
-// Classification keywords
-const otKeywords = [
-  'siemens','schneider','honeywell','rockwell','abb','yokogawa',
-  'mitsubishi','emerson','trane','phoenix contact','codesys',
-  'inductive automation','ignition','opc'
-];
+function processData(newItems) {
+  // Merge and de-duplicate by CVE ID
+  const map = new Map();
+  newItems.forEach(v => {
+    const text = (v.vendorProject + v.product + v.shortDescription).toLowerCase();
+    let track = 'it';
+    if (keywords.ot.some(k => text.includes(k))) track = 'ot';
+    else if (keywords.con.some(k => text.includes(k))) track = 'con';
 
-const consumerKeywords = [
-  'android','ios','iphone','ipad','macos','windows 10','windows 11',
-  'router','home','wi-fi','wifi','smart','camera','tv','television',
-  'playstation','xbox','nintendo','edge','chrome','safari','firefox'
-];
-
-function classifyEntry(v) {
-  const vendor = (v.vendorProject || '').toLowerCase();
-  const product = (v.product || '').toLowerCase();
-  const desc = (v.shortDescription || '').toLowerCase();
-  const text = vendor + ' ' + product + ' ' + desc;
-
-  const isOT = otKeywords.some(k => text.includes(k));
-  const isConsumer = !isOT && consumerKeywords.some(k => text.includes(k));
-
-  if (isOT) return 'ot';
-  if (isConsumer) return 'consumer';
-  return 'it';
-}
-
-function processIntelligence(vulns) {
-  const itList = [];
-  const otList = [];
-  const consumerList = [];
-
-  vulns.forEach(v => {
-    const track = classifyEntry(v);
-    const base = {
-      id: v.cveID,
-      vendor: v.vendorProject,
-      prod: v.product,
-      desc: v.shortDescription,
-      track
-    };
-    if (track === 'ot') otList.push(base);
-    else if (track === 'consumer') consumerList.push(base);
-    else itList.push(base);
+    map.set(v.cveID, {
+      cve: v.cveID, vendor: v.vendorProject, product: v.product, 
+      desc: v.shortDescription, date: v.dateAdded, track: track,
+      action: v.requiredAction
+    });
   });
 
-  // KPIs
-  document.getElementById('itCount').textContent = itList.length;
-  document.getElementById('otCount').textContent = otList.length;
-  document.getElementById('consumerCount').textContent = consumerList.length;
-  document.getElementById('kpi-total').textContent = vulns.length;
-  document.getElementById('kpi-ot').textContent = otList.length;
-  document.getElementById('kpi-consumer').textContent = consumerList.length;
-  document.getElementById('kpi-critical').textContent =
-    Math.max(1, Math.floor(vulns.length * 0.3)); // simple estimate
+  const merged = Array.from(map.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  allVulns.it = merged.filter(v => v.track === 'it');
+  allVulns.ot = merged.filter(v => v.track === 'ot');
+  allVulns.con = merged.filter(v => v.track === 'con');
+  allVulns.raw = merged;
 
-  // Tables
-  renderOverviewTable('overview-table', vulns.slice(0, 30));
-  renderSimpleTable('it-table', itList);
-  renderSimpleTable('ot-table', otList);
-  renderSimpleTable('consumer-table', consumerList);
+  updateUI();
 }
 
-function renderOverviewTable(targetId, data) {
-  const tbody = document.getElementById(targetId);
-  if (!tbody) return;
-  tbody.innerHTML = data.map(d => {
-    const track = classifyEntry(d);
-    let badgeClass = '';
-    let badgeLabel = '';
-    if (track === 'ot') { badgeClass = 'badge badge-ot'; badgeLabel = 'OT / ICS'; }
-    else if (track === 'consumer') { badgeClass = 'badge badge-consumer'; badgeLabel = 'Consumer'; }
-    else { badgeClass = 'badge'; badgeLabel = 'IT'; }
+function updateUI() {
+  document.getElementById('itBadge').textContent = allVulns.it.length;
+  document.getElementById('otBadge').textContent = allVulns.ot.length;
+  document.getElementById('conBadge').textContent = allVulns.con.length;
+  document.getElementById('kpi-it').textContent = allVulns.it.length;
+  document.getElementById('kpi-ot').textContent = allVulns.ot.length;
+  document.getElementById('kpi-con').textContent = allVulns.con.length;
 
-    return `
-      <tr>
-        <td style="color:var(--accent); font-family:'JetBrains Mono',monospace; font-weight:600">
-          ${d.cveID}
-        </td>
-        <td><strong>${d.vendorProject || '—'}</strong></td>
-        <td>${d.product || '—'}</td>
-        <td><span class="${badgeClass}">${badgeLabel}</span></td>
-        <td style="color:var(--text2); font-size:12px">
-          ${(d.shortDescription || '').substring(0, 90)}...
-        </td>
-      </tr>
-    `;
-  }).join('');
+  renderTable('overview-body', allVulns.raw.slice(0, 25), true);
+  renderTable('it-body', allVulns.it);
+  renderTable('ot-body', allVulns.ot, false, true);
+  renderTable('con-body', allVulns.con);
 }
 
-function renderSimpleTable(targetId, list) {
+function renderTable(targetId, data, isOverview = false, includeDate = false) {
   const tbody = document.getElementById(targetId);
-  if (!tbody) return;
-  if (!list.length) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="4" style="text-align:center; padding:16px; color:var(--text3); font-size:12px">
-          No entries available for this category. Click "Sync Now" to fetch latest from CISA KEV.
-        </td>
-      </tr>`;
-    return;
-  }
-  tbody.innerHTML = list.map(d => `
-    <tr>
-      <td style="color:var(--accent); font-family:'JetBrains Mono',monospace; font-weight:600">
-        ${d.id}
-      </td>
-      <td><strong>${d.vendor || '—'}</strong></td>
-      <td>${d.prod || '—'}</td>
-      <td style="color:var(--text2); font-size:12px">${(d.desc || '').substring(0, 90)}...</td>
+  tbody.innerHTML = data.map(v => `
+    <tr class="clickable-row" onclick='openDrawer(${JSON.stringify(v).replace(/'/g, "&apos;")})'>
+      <td style="color:var(--accent); font-family:monospace; font-weight:600">${v.cve}</td>
+      <td><strong>${v.vendor}</strong></td>
+      <td>${v.product}</td>
+      ${isOverview ? `<td><span class="badge badge-${v.track}">${v.track.toUpperCase()}</span></td>` : ''}
+      ${includeDate ? `<td>${v.date}</td>` : ''}
     </tr>
   `).join('');
 }
 
-// Navigation
+function filterTable(type, query) {
+  const q = query.toLowerCase();
+  const filtered = allVulns[type].filter(v => 
+    v.cve.toLowerCase().includes(q) || 
+    v.vendor.toLowerCase().includes(q) || 
+    v.product.toLowerCase().includes(q)
+  );
+  renderTable(type + '-body', filtered, false, type === 'ot');
+}
+
+// ──────────────────────────────────────────
+//  DRAWER & UI HELPERS
+// ──────────────────────────────────────────
+function openDrawer(v) {
+  document.getElementById('drawer-title').textContent = v.cve;
+  document.getElementById('drawer-vendor').textContent = v.vendor;
+  document.getElementById('drawer-product').textContent = v.product;
+  document.getElementById('drawer-desc').textContent = v.desc;
+  
+  const mit = document.getElementById('drawer-mitigation');
+  mit.innerHTML = `<li>${v.action || 'Apply vendor-supplied patches immediately.'}</li>
+                   <li>Restrict network access to affected systems.</li>
+                   <li>Monitor logs for indicators of compromise (IoC).</li>`;
+  
+  document.getElementById('drawer-links').innerHTML = `
+    <a href="https://nvd.nist.gov/vuln/detail/${v.cve}" target="_blank" class="btn btn-primary">View on NIST NVD</a>
+  `;
+
+  document.getElementById('cve-drawer').classList.add('open');
+  document.getElementById('drawer-backdrop').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('cve-drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+}
+
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  const page = document.getElementById('page-' + id);
-  if (page) page.classList.add('active');
-  if (btn) btn.classList.add('active');
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('pageTitle').textContent = btn.innerText.split('\n')[0];
 }
 
-// Toast
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('theme-toggle').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+
 function showToast(msg) {
   const t = document.getElementById('toast');
-  if (!t) return;
   t.textContent = msg;
   t.style.display = 'block';
-  clearTimeout(showToast._timer);
-  showToast._timer = setTimeout(() => { t.style.display = 'none'; }, 3500);
+  setTimeout(() => t.style.display = 'none', 3000);
 }
 </script>
 </body>
