@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZeroGuard — Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+button{cursor:pointer;border:none;background:none;font:inherit}
+input{font:inherit}
+table{border-collapse:collapse;width:100%}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+[data-theme="dark"]{
+  --bg:#0d0f14; --surface:#131720; --surface2:#1a2030; --surface3:#1f2638;
+  --border:#252d3d; --border2:#2e3850; --text:#e2e8f0; --text2:#94a3b8; --text3:#64748b;
+  --accent:#3b82f6; --accent-h:#2563eb; --accent-dim:rgba(59,130,246,0.12);
+  --green:#22c55e; --green-dim:rgba(34,197,94,0.12); --red:#ef4444; --red-dim:rgba(239,68,68,0.12);
+  --orange:#f97316; --orange-dim:rgba(249,115,22,0.12); --yellow:#eab308; --yellow-dim:rgba(234,179,8,0.12);
+  --purple:#a855f7; --purple-dim:rgba(168,85,247,0.12); --cyan:#06b6d4; --cyan-dim:rgba(6,182,212,0.12);
+  --shadow:0 4px 24px rgba(0,0,0,0.4); --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+}
+
+body{background:var(--bg);color:var(--text)}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px}
+.logo-area{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-section{padding:12px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;width:100%;text-align:left}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:var(--shadow-sm)}
+.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.kpi-val{font-size:28px;font-weight:700}
+
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.cve-table{width:100%;font-size:13px}
+.cve-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border)}
+.cve-table td{padding:11px 14px;border-bottom:1px solid var(--border)}
+.cve-table tr:hover{background:rgba(148,163,184,0.06)}
+
+.badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-critical{background:var(--red-dim);color:var(--red)}
+.badge-ot{background:var(--cyan-dim);color:var(--cyan)}
+.badge-consumer{background:var(--yellow-dim);color:var(--yellow)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;transition:background 0.15s,color 0.15s,transform 0.1s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-h);transform:translateY(-1px)}
+.btn.syncing svg{animation:spin 1s linear infinite}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;z-index:9999;display:none;font-size:12px;color:var(--text2);box-shadow:var(--shadow)}
+.page{display:none}
+.page.active{display:block}
+
+.topbar-title{font-weight:600;font-size:15px;margin-bottom:2px}
+.footer-note{font-size:10px;color:var(--text3);text-align:center}
+
+@media (max-width:768px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;min-width:0;flex-direction:row;align-items:center;overflow-x:auto;height:60px}
+  .logo-area{border-bottom:none;border-right:1px solid var(--border);padding:10px 12px}
+  .nav-section{display:flex;gap:4px;padding:8px}
+  .sidebar-footer{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="#fff" fill="none" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="logo-text">ZeroGuard</div>
+    </div>
+    <div class="nav-section">
+      <button class="nav-item active" onclick="showPage('overview',this)">Overview</button>
+      <button class="nav-item" onclick="showPage('it-vulns',this)">
+        IT Vulnerabilities
+        <span class="nav-badge" id="itCount">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('ot-ics',this)">
+        OT / ICS Advisories
+        <span class="nav-badge" id="otCount" style="background:var(--cyan)">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('consumer',this)">
+        Consumer Devices
+        <span class="nav-badge" id="consumerCount" style="background:var(--yellow)">0</span>
+      </button>
+    </div>
+    <div class="sidebar-footer" style="margin-top:auto; padding:12px; border-top:1px solid var(--border)">
+      <div class="footer-note">
+        Created &amp; Designed by
+        <span style="color:var(--accent); font-weight:600">Ahmed Khalil</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div style="flex:1">
+        <div class="topbar-title">Threat Intelligence</div>
+        <div style="font-size:11px; color:var(--text3)">
+          Sources: CISA KEV + NIST • <span id="syncTime">Not Synced</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="syncBtn" onclick="doSync()">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2">
+          <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+        Sync Now
+      </button>
+    </header>
+
+    <main class="content">
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Total Alerts</div>
+            <div class="kpi-val" id="kpi-total" style="color:var(--accent)">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Critical (Est.)</div>
+            <div class="kpi-val" id="kpi-critical" style="color:var(--red)">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">OT / ICS Assets</div>
+            <div class="kpi-val" id="kpi-ot" style="color:var(--cyan)">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Consumer Devices</div>
+            <div class="kpi-val" id="kpi-consumer" style="color:var(--yellow)">0</div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
+            Aggregated Security Feed
+          </div>
+          <table class="cve-table">
+            <thead>
+              <tr>
+                <th>CVE ID</th>
+                <th>Vendor</th>
+                <th>Product</th>
+                <th>Track</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="overview-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- IT VULNS -->
+      <div class="page" id="page-it-vulns">
+        <div class="table-wrap">
+          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
+            IT Vulnerabilities
+          </div>
+          <table class="cve-table">
+            <thead>
+              <tr>
+                <th>CVE ID</th>
+                <th>Vendor</th>
+                <th>Product</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="it-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OT / ICS -->
+      <div class="page" id="page-ot-ics">
+        <div class="table-wrap">
+          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
+            OT / ICS Advisories
+          </div>
+          <table class="cve-table">
+            <thead>
+              <tr>
+                <th>CVE ID</th>
+                <th>Vendor</th>
+                <th>Product</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="ot-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CONSUMER DEVICES -->
+      <div class="page" id="page-consumer">
+        <div class="table-wrap">
+          <div style="padding:15px; font-weight:700; border-bottom:1px solid var(--border)">
+            Consumer / Everyday Devices
+          </div>
+          <table class="cve-table">
+            <thead>
+              <tr>
+                <th>CVE ID</th>
+                <th>Vendor</th>
+                <th>Product</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="consumer-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ──────────────────────────────────────────
+//  CORE OPERATIONS ENGINE (CISA KEV)
+// ──────────────────────────────────────────
+
+async function doSync() {
+  const btn = document.getElementById('syncBtn');
+  if (!btn) return;
+  btn.classList.add('syncing');
+  btn.disabled = true;
+  showToast('Connecting to CISA KEV feed...');
+
+  const PROXY = "https://corsproxy.io/?";
+  const CISA_KEV = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
+
+  try {
+    const response = await fetch(PROXY + encodeURIComponent(CISA_KEV));
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    if (!data || !Array.isArray(data.vulnerabilities)) throw new Error('Unexpected KEV format');
+
+    processIntelligence(data.vulnerabilities);
+    document.getElementById('syncTime').textContent =
+      'Last sync: ' + new Date().toLocaleTimeString();
+    showToast('Success: Live KEV data aggregated.');
+  } catch (err) {
+    console.error(err);
+    showToast('Sync error: CISA KEV feed not reachable in this environment.');
+  } finally {
+    btn.classList.remove('syncing');
+    btn.disabled = false;
+  }
+}
+
+// Classification keywords
+const otKeywords = [
+  'siemens','schneider','honeywell','rockwell','abb','yokogawa',
+  'mitsubishi','emerson','trane','phoenix contact','codesys',
+  'inductive automation','ignition','opc'
+];
+
+const consumerKeywords = [
+  'android','ios','iphone','ipad','macos','windows 10','windows 11',
+  'router','home','wi-fi','wifi','smart','camera','tv','television',
+  'playstation','xbox','nintendo','edge','chrome','safari','firefox'
+];
+
+function classifyEntry(v) {
+  const vendor = (v.vendorProject || '').toLowerCase();
+  const product = (v.product || '').toLowerCase();
+  const desc = (v.shortDescription || '').toLowerCase();
+  const text = vendor + ' ' + product + ' ' + desc;
+
+  const isOT = otKeywords.some(k => text.includes(k));
+  const isConsumer = !isOT && consumerKeywords.some(k => text.includes(k));
+
+  if (isOT) return 'ot';
+  if (isConsumer) return 'consumer';
+  return 'it';
+}
+
+function processIntelligence(vulns) {
+  const itList = [];
+  const otList = [];
+  const consumerList = [];
+
+  vulns.forEach(v => {
+    const track = classifyEntry(v);
+    const base = {
+      id: v.cveID,
+      vendor: v.vendorProject,
+      prod: v.product,
+      desc: v.shortDescription,
+      track
+    };
+    if (track === 'ot') otList.push(base);
+    else if (track === 'consumer') consumerList.push(base);
+    else itList.push(base);
+  });
+
+  // KPIs
+  document.getElementById('itCount').textContent = itList.length;
+  document.getElementById('otCount').textContent = otList.length;
+  document.getElementById('consumerCount').textContent = consumerList.length;
+  document.getElementById('kpi-total').textContent = vulns.length;
+  document.getElementById('kpi-ot').textContent = otList.length;
+  document.getElementById('kpi-consumer').textContent = consumerList.length;
+  document.getElementById('kpi-critical').textContent =
+    Math.max(1, Math.floor(vulns.length * 0.3)); // simple estimate
+
+  // Tables
+  renderOverviewTable('overview-table', vulns.slice(0, 30));
+  renderSimpleTable('it-table', itList);
+  renderSimpleTable('ot-table', otList);
+  renderSimpleTable('consumer-table', consumerList);
+}
+
+function renderOverviewTable(targetId, data) {
+  const tbody = document.getElementById(targetId);
+  if (!tbody) return;
+  tbody.innerHTML = data.map(d => {
+    const track = classifyEntry(d);
+    let badgeClass = '';
+    let badgeLabel = '';
+    if (track === 'ot') { badgeClass = 'badge badge-ot'; badgeLabel = 'OT / ICS'; }
+    else if (track === 'consumer') { badgeClass = 'badge badge-consumer'; badgeLabel = 'Consumer'; }
+    else { badgeClass = 'badge'; badgeLabel = 'IT'; }
+
+    return `
+      <tr>
+        <td style="color:var(--accent); font-family:'JetBrains Mono',monospace; font-weight:600">
+          ${d.cveID}
+        </td>
+        <td><strong>${d.vendorProject || '—'}</strong></td>
+        <td>${d.product || '—'}</td>
+        <td><span class="${badgeClass}">${badgeLabel}</span></td>
+        <td style="color:var(--text2); font-size:12px">
+          ${(d.shortDescription || '').substring(0, 90)}...
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderSimpleTable(targetId, list) {
+  const tbody = document.getElementById(targetId);
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align:center; padding:16px; color:var(--text3); font-size:12px">
+          No entries available for this category. Click "Sync Now" to fetch latest from CISA KEV.
+        </td>
+      </tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(d => `
+    <tr>
+      <td style="color:var(--accent); font-family:'JetBrains Mono',monospace; font-weight:600">
+        ${d.id}
+      </td>
+      <td><strong>${d.vendor || '—'}</strong></td>
+      <td>${d.prod || '—'}</td>
+      <td style="color:var(--text2); font-size:12px">${(d.desc || '').substring(0, 90)}...</td>
+    </tr>
+  `).join('');
+}
+
+// Navigation
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+</script>
+</body>
+</html>
