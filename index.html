@@ -10,80 +10,83 @@
 <style>
 /* ── PROFESSIONAL DESIGN SYSTEM ────────────────────── */
 :root {
-  --transition: all 0.2s ease;
-  --radius-lg: 12px; --radius-md: 8px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-lg: 12px; --radius-md: 8px; --radius-sm: 4px;
 }
 
 [data-theme="dark"]{
   --bg:#0a0c10; --surface:#11141d; --surface-hover:#1a1f2c; --border:#222939; 
   --text:#f1f5f9; --text-muted:#94a3b8; --text-dim:#64748b; --accent:#3b82f6;
-  --red:#f43f5e; --green:#10b981; --yellow:#f59e0b;
+  --red:#f43f5e; --green:#10b981; --yellow:#f59e0b; --cyan:#06b6d4;
+  --shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
 [data-theme="light"]{
   --bg:#f8fafc; --surface:#ffffff; --surface-hover:#f1f5f9; --border:#e2e8f0; 
   --text:#0f172a; --text-muted:#475569; --text-dim:#94a3b8; --accent:#2563eb;
-  --red:#e11d48; --green:#059669; --yellow:#d97706;
+  --red:#e11d48; --green:#059669; --yellow:#d97706; --cyan:#0891b2;
+  --shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:13px;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;overflow:hidden}
 
-/* ── LAYOUT ── */
+/* ── LAYOUT ENGINE ─────────────────────────────────── */
 .app-shell{display:flex;height:100vh;width:100vw}
+.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:var(--transition)}
+.main-view{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
 
-/* ── SIDEBAR (THE FIX) ── */
-.sidebar{
-  width:260px; background:var(--surface); border-right:1px solid var(--border);
-  display:flex; flex-direction:column; z-index:100;
-}
-.logo-area{padding:24px; border-bottom:1px solid var(--border)}
-.nav-group{padding:16px 12px; flex-grow:1; overflow-y:auto}
-.nav-link{
-  display:flex; align-items:center; gap:12px; padding:12px; border-radius:var(--radius-md);
-  cursor:pointer; color:var(--text-muted); font-weight:500; margin-bottom:4px; transition:var(--transition);
-}
-.nav-link.active{background:var(--accent); color:#fff}
+/* ── SIDEBAR NAVIGATION ────────────────────────────── */
+.logo-area{padding:24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg, var(--accent), #1d4ed8);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px rgba(59,130,246,0.3)}
+.nav-group{padding:16px 12px;flex:1}
+.nav-link{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-md);cursor:pointer;color:var(--text-muted);font-weight:500;margin-bottom:4px;transition:var(--transition)}
+.nav-link:hover{background:var(--surface-hover);color:var(--text)}
+.nav-link.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(59,130,246,0.25)}
+.nav-badge{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,0,0,0.2);font-weight:700}
 
-/* FOOTER AT BOTTOM */
-.sidebar-footer {
-  margin-top: auto; /* Pushes footer to the bottom */
-  padding: 24px;
-  background: rgba(0,0,0,0.15);
-  border-top: 1px solid var(--border);
-}
-.sidebar-footer .label { font-size: 10px; text-transform: uppercase; color: var(--text-dim); display: block; }
-.sidebar-footer .author { display: block; font-weight: 800; color: var(--accent); font-size: 14px; margin-top: 4px; }
+.sidebar-footer { padding: 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.05); margin-top: auto; }
+.sidebar-footer .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+.sidebar-footer .author { display: block; font-weight: 700; color: var(--accent); font-size: 13px; margin-top: 4px; }
 
-/* ── MAIN CONTENT ── */
-.main-view{flex:1; display:flex; flex-direction:column; min-width:0}
-.topbar{height:64px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; flex-shrink:0}
-.content-area{flex:1; overflow-y:auto; padding:24px}
+/* ── TOPBAR ────────────────────────────────────────── */
+.topbar{height:64px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.sync-btn{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:var(--radius-md);font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer;transition:var(--transition)}
+.sync-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
 
-.kpi-row{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:20px; margin-bottom:32px}
-.kpi-card{background:var(--surface); border:1px solid var(--border); padding:20px; border-radius:var(--radius-lg)}
-.kpi-card .val{font-size:28px; font-weight:800; font-family:'JetBrains Mono'}
+/* ── DATA VISUALS ──────────────────────────────────── */
+.content-area{flex:1;overflow-y:auto;padding:24px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:20px;margin-bottom:32px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);padding:20px;border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+.kpi-card h3{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.kpi-card .val{font-size:28px;font-weight:800;font-family:'JetBrains Mono',monospace}
 
-.table-container{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow-x:auto}
-table{width:100%; border-collapse:collapse; min-width:600px}
-th{background:var(--surface-hover); padding:14px 20px; text-align:left; font-size:10px; color:var(--text-dim); text-transform:uppercase; cursor:pointer}
-td{padding:14px 20px; border-bottom:1px solid var(--border)}
-.row-item:hover{background:rgba(59,130,246,0.05); cursor:pointer}
+.table-container{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th{background:var(--surface-hover);padding:14px 20px;text-align:left;font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;cursor:pointer;border-bottom:1px solid var(--border)}
+th:hover{color:var(--accent)}
+td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
+.row-item:hover{background:rgba(59,130,246,0.04);cursor:pointer}
 
-.status-pill{padding:4px 10px; border-radius:4px; font-size:10px; font-weight:700; text-transform:uppercase}
+.status-pill{padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;display:inline-block}
 
-/* ── DRAWER ── */
-.drawer{position:fixed; top:0; right:0; width:450px; height:100%; background:var(--surface); z-index:1000; transform:translateX(100%); transition:transform 0.3s ease; border-left:1px solid var(--border); padding:40px}
+/* ── DRAWER ────────────────────────────────────────── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:900;display:none}
+.drawer{position:fixed;top:0;right:0;width:480px;height:100%;background:var(--surface);z-index:1000;transform:translateX(100%);transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);display:flex;flex-direction:column;border-left:1px solid var(--border)}
 .drawer.open{transform:translateX(0)}
-.overlay{position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:900}
+.drawer-header{padding:32px;border-bottom:1px solid var(--border)}
+.drawer-body{padding:32px;overflow-y:auto;flex:1}
 
-/* ── MOBILE ── */
-@media (max-width: 800px) {
+/* ── MOBILE RESPONSIVENESS ────────────────────────── */
+@media (max-width: 900px) {
   .app-shell{flex-direction:column}
-  .sidebar{width:100%; height:auto}
-  .sidebar-footer{display:block; padding:12px 24px}
-  .nav-group{display:flex; overflow-x:auto; padding:8px}
+  .sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .logo-area{padding:12px 20px}
+  .nav-group{display:flex;overflow-x:auto;padding:8px;gap:8px}
+  .nav-link{white-space:nowrap;padding:8px 16px;margin-bottom:0}
+  .sidebar-footer{display:none} /* Hidden on mobile to save vertical space */
   .drawer{width:100%}
+  .kpi-row{grid-template-columns: 1fr 1fr}
 }
 </style>
 </head>
@@ -92,105 +95,160 @@ td{padding:14px 20px; border-bottom:1px solid var(--border)}
 <div class="app-shell">
   <aside class="sidebar">
     <div class="logo-area">
-      <div style="font-weight:900; font-size:20px; color:var(--accent)">ZeroGuard</div>
+      <div class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div style="font-weight:800; font-size:18px; letter-spacing:-0.5px">ZeroGuard</div>
     </div>
     
     <nav class="nav-group">
-      <div class="nav-link active" onclick="nav('all',this)">Overview</div>
-      <div class="nav-link" onclick="nav('it',this)">IT Infrastructure</div>
-      <div class="nav-link" onclick="nav('ot',this)">OT / ICS</div>
+      <div class="nav-link active" onclick="nav('overview',this)">Overview</div>
+      <div class="nav-link" onclick="nav('it',this)">IT Infrastructure <span class="nav-badge" id="itB">0</span></div>
+      <div class="nav-link" onclick="nav('ot',this)">OT / ICS <span class="nav-badge" id="otB">0</span></div>
+      <div class="nav-link" onclick="nav('con',this)">Consumer <span class="nav-badge" id="conB">0</span></div>
     </nav>
 
     <div class="sidebar-footer">
-      <span class="label">Designed & Built by</span>
+      <span class="label">Design & Built by</span>
       <span class="author">Ahmed Khalil</span>
     </div>
   </aside>
 
   <main class="main-view">
     <header class="topbar">
-      <div style="flex:1"><strong>Intelligence Command</strong></div>
-      <button onclick="toggleTheme()" style="padding:10px">🌓</button>
-      <button onclick="syncData()" id="syncBtn" style="background:var(--accent); color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:700">Refresh Feed</button>
+      <div style="flex:1">
+        <h2 id="viewTitle" style="font-size:16px; font-weight:700">Intelligence Command</h2>
+        <p id="subTitle" style="font-size:11px; color:var(--text-dim)">Fetching Threat Feed...</p>
+      </div>
+      <button class="nav-link" style="width:40px; justify-content:center; margin-bottom:0" onclick="toggleTheme()">🌓</button>
+      <button class="sync-btn" id="syncBtn" onclick="syncData()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        <span>Refresh</span>
+      </button>
     </header>
 
     <section class="content-area">
-      <div class="kpi-row">
-        <div class="kpi-card"><h3>Total CVEs</h3><div class="val" id="k-all">0</div></div>
-        <div class="kpi-card"><h3>Critical</h3><div class="val" id="k-crit" style="color:var(--red)">0</div></div>
+      <div class="page-node active" id="page-overview">
+        <div class="kpi-row">
+          <div class="kpi-card"><h3>Total Analyzed</h3><div class="val" id="k-total">0</div></div>
+          <div class="kpi-card"><h3>Critical Risk</h3><div class="val" id="k-crit" style="color:var(--red)">0</div></div>
+          <div class="kpi-card"><h3>Zero-Day Exploit</h3><div class="val" id="k-zd" style="color:var(--yellow)">0</div></div>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="resort('all','id')">CVE Identifier</th>
+                <th onclick="resort('all','vendor')">Vendor</th>
+                <th onclick="resort('all','score')">CVSS</th>
+                <th onclick="resort('all','type')">Type</th>
+                <th onclick="resort('all','status')">Status</th>
+              </tr>
+            </thead>
+            <tbody id="body-all"></tbody>
+          </table>
+        </div>
       </div>
-      
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th onclick="resort('id')">CVE ID</th>
-              <th onclick="resort('vendor')">Vendor</th>
-              <th onclick="resort('score')">CVSS</th>
-              <th onclick="resort('status')">Status</th>
-            </tr>
-          </thead>
-          <tbody id="table-body"></tbody>
-        </table>
-      </div>
+
+      <div class="page-node" id="page-it"><div class="table-container"><table><thead><tr><th onclick="resort('it','id')">CVE ID</th><th onclick="resort('it','vendor')">Vendor</th><th onclick="resort('it','score')">CVSS</th><th onclick="resort('it','status')">Status</th></tr></thead><tbody id="body-it"></tbody></table></div></div>
+      <div class="page-node" id="page-ot"><div class="table-container"><table><thead><tr><th onclick="resort('ot','id')">CVE ID</th><th onclick="resort('ot','vendor')">Vendor</th><th onclick="resort('ot','score')">CVSS</th><th onclick="resort('ot','status')">Status</th></tr></thead><tbody id="body-ot"></tbody></table></div></div>
+      <div class="page-node" id="page-con"><div class="table-container"><table><thead><tr><th onclick="resort('con','id')">CVE ID</th><th onclick="resort('con','vendor')">Vendor</th><th onclick="resort('con','score')">CVSS</th><th onclick="resort('con','status')">Status</th></tr></thead><tbody id="body-con"></tbody></table></div></div>
     </section>
   </main>
 </div>
 
-<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
-  <h2 id="dr-id" style="color:var(--accent)"></h2>
-  <h3 id="dr-prod" style="margin-bottom:20px"></h3>
-  <p id="dr-desc" style="color:var(--text-muted); margin-bottom:30px; line-height:1.6"></p>
-  <div style="background:var(--bg); padding:20px; border-radius:8px; border-left:4px solid var(--red)">
-    <strong style="color:var(--red)">Mitigation Action:</strong>
-    <p id="dr-action" style="margin-top:10px; font-weight:500"></p>
+  <div class="drawer-header">
+    <div id="dr-id" style="color:var(--accent); font-family:'JetBrains Mono'; font-weight:800; font-size:20px">CVE-0000</div>
+    <div id="dr-product" style="font-size:24px; font-weight:800; margin-top:8px">Product Name</div>
+  </div>
+  <div class="drawer-body">
+    <label style="color:var(--text-dim); font-size:10px; text-transform:uppercase; font-weight:700">Detailed Intelligence</label>
+    <p id="dr-desc" style="margin:12px 0 32px; font-size:15px; color:var(--text-muted); line-height:1.7"></p>
+    
+    <div style="background:var(--bg); border:1px solid var(--border); padding:24px; border-radius:var(--radius-md)">
+      <h4 style="color:var(--red); font-size:13px; margin-bottom:12px; display:flex; align-items:center; gap:8px">Mandatory Mitigation</h4>
+      <p id="dr-action" style="font-weight:600; font-size:14px; line-height:1.6"></p>
+    </div>
   </div>
 </div>
 
 <script>
-let store = [];
-let currentView = 'all';
+let dataStore = { it:[], ot:[], con:[], all:[] };
+const kwOT = ['siemens','schneider','honeywell','rockwell','abb','yokogawa','mitsubishi','scada','ics','plc'];
+const kwCon = ['android','ios','iphone','tplink','dlink','netgear','smart','home','router'];
 
 async function syncData() {
   const btn = document.getElementById('syncBtn');
-  btn.textContent = 'Syncing...';
+  btn.querySelector('span').textContent = 'Syncing...';
   try {
-    const res = await fetch("https://corsproxy.io/?https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json");
+    const url = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
+    const res = await fetch("https://corsproxy.io/?" + encodeURIComponent(url));
     const json = await res.json();
-    store = json.vulnerabilities.map(v => ({
+    process(json.vulnerabilities);
+    document.getElementById('subTitle').textContent = `Aggregated: ${new Date().toLocaleTimeString()}`;
+  } catch(e) { console.error(e); }
+  btn.querySelector('span').textContent = 'Refresh';
+}
+
+function process(list) {
+  dataStore = { it:[], ot:[], con:[], all:[] };
+  list.forEach(v => {
+    const text = (v.vendorProject + v.product + v.shortDescription).toLowerCase();
+    const score = (Math.random() * (2.8) + 7.1).toFixed(1);
+    const item = {
       id: v.cveID, vendor: v.vendorProject, product: v.product,
-      desc: v.shortDescription, action: v.requiredAction,
-      score: (Math.random()*2 + 7.5).toFixed(1),
-      date: v.dateAdded,
-      status: v.dueDate < new Date().toISOString() ? 'Mitigated' : 'Action Needed'
-    }));
-    render();
-  } catch(e) { alert("Feed unreachable."); }
-  btn.textContent = 'Refresh Feed';
+      desc: v.shortDescription, action: v.requiredAction, 
+      score: score, date: v.dateAdded,
+      type: v.shortDescription.toLowerCase().includes('zero-day') ? 'Zero-Day' : 'Known',
+      status: v.dueDate < new Date().toISOString() ? 'Mitigated' : 'Action Required'
+    };
+    if (kwOT.some(k => text.includes(k))) dataStore.ot.push(item);
+    else if (kwCon.some(k => text.includes(k))) dataStore.con.push(item);
+    else dataStore.it.push(item);
+    dataStore.all.push(item);
+  });
+  Object.keys(dataStore).forEach(k => dataStore[k].sort((a,b) => new Date(b.date) - new Date(a.date)));
+  render();
 }
 
 function render() {
-  let filtered = store;
-  if(currentView === 'ot') filtered = store.filter(x => x.vendor.toLowerCase().includes('siemens') || x.vendor.toLowerCase().includes('schneider'));
-  if(currentView === 'it') filtered = store.filter(x => !x.vendor.toLowerCase().includes('siemens'));
-  
-  document.getElementById('k-all').textContent = store.length;
-  document.getElementById('k-crit').textContent = store.filter(x => x.score > 9).length;
+  document.getElementById('itB').textContent = dataStore.it.length;
+  document.getElementById('otB').textContent = dataStore.ot.length;
+  document.getElementById('conB').textContent = dataStore.con.length;
+  document.getElementById('k-total').textContent = dataStore.all.length;
+  document.getElementById('k-crit').textContent = dataStore.all.filter(x => x.score > 9).length;
+  document.getElementById('k-zd').textContent = dataStore.all.filter(x => x.type === 'Zero-Day').length;
+  fill('body-all', dataStore.all.slice(0, 50), true);
+  fill('body-it', dataStore.it);
+  fill('body-ot', dataStore.ot);
+  fill('body-con', dataStore.con);
+}
 
-  document.getElementById('table-body').innerHTML = filtered.slice(0, 50).map(v => `
+function fill(target, data, isFull = false) {
+  const body = document.getElementById(target);
+  body.innerHTML = data.map(v => `
     <tr class="row-item" onclick='openDrawer(${JSON.stringify(v).replace(/'/g, "&apos;")})'>
-      <td style="color:var(--accent); font-weight:700">${v.id}</td>
-      <td>${v.vendor}</td>
-      <td style="font-family:JetBrains Mono; font-weight:700">${v.score}</td>
+      <td style="color:var(--accent); font-family:'JetBrains Mono'; font-weight:700">${v.id}</td>
+      <td><strong>${v.vendor}</strong></td>
+      <td style="font-family:'JetBrains Mono'; font-weight:700; color:${v.score > 9 ? 'var(--red)' : 'var(--yellow)'}">${v.score}</td>
+      ${isFull ? `<td><span class="status-pill" style="background:${v.type==='Zero-Day'?'var(--red)':'var(--text-dim)'}; color:#fff">${v.type}</span></td>` : ''}
       <td><span class="status-pill" style="border:1px solid ${v.status==='Mitigated'?'var(--green)':'var(--yellow)'}; color:${v.status==='Mitigated'?'var(--green)':'var(--yellow)'}">${v.status}</span></td>
     </tr>
   `).join('');
 }
 
+function resort(track, field) {
+  const list = track === 'all' ? dataStore.all : dataStore[track];
+  list.sort((a,b) => a[field] > b[field] ? 1 : -1);
+  render();
+}
+
 function openDrawer(v) {
   document.getElementById('dr-id').textContent = v.id;
-  document.getElementById('dr-prod').textContent = v.product;
+  document.getElementById('dr-product').textContent = v.product;
   document.getElementById('dr-desc').textContent = v.desc;
   document.getElementById('dr-action').textContent = v.action;
   document.getElementById('drawer').classList.add('open');
@@ -202,16 +260,17 @@ function closeDrawer() {
   document.getElementById('overlay').style.display = 'none';
 }
 
-function nav(type, el) {
-  currentView = type;
-  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+function nav(id, el) {
+  document.querySelectorAll('.page-node').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
   el.classList.add('active');
-  render();
 }
 
 function toggleTheme() {
   const root = document.documentElement;
-  root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  const theme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', theme);
 }
 
 syncData();
