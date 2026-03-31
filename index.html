@@ -97,11 +97,12 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
       <div class="logo-mark">Z</div>
       <div style="font-weight:800; font-size:18px">ZeroGuard</div>
     </div>
-    
+
     <nav class="nav-group">
       <div class="nav-link active" onclick="switchTab('overview',this)">Overview</div>
       <div class="nav-link" onclick="switchTab('it',this)">IT Infrastructure</div>
       <div class="nav-link" onclick="switchTab('ot',this)">OT / ICS Systems</div>
+      <div class="nav-link" onclick="switchTab('consumer',this)">Consumers' Devices</div>
       <div class="nav-link" onclick="switchTab('news',this)">Global Threat Feed</div>
     </nav>
 
@@ -117,7 +118,7 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
         <h2 id="viewTitle" style="font-size:16px; font-weight:700">Security Operations Command</h2>
         <p id="subTitle" style="font-size:11px; color:var(--text-dim)">Aggregating Intelligence...</p>
       </div>
-      <button onclick="toggleTheme()" style="font-size:18px; padding:10px">🌓</button>
+      <button onclick="toggleTheme()" style="font-size:18px; padding:10px; background:transparent; border:none; cursor:pointer;">🌓</button>
       <button onclick="syncAll()" id="syncBtn" style="background:var(--accent); color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:700; cursor:pointer">Refresh All</button>
     </header>
 
@@ -137,6 +138,10 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
 
       <div class="page-node" id="tab-ot">
         <div class="table-container"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>CVSS</th></tr></thead><tbody id="body-ot"></tbody></table></div>
+      </div>
+
+      <div class="page-node" id="tab-consumer">
+        <div class="table-container"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>CVSS</th></tr></thead><tbody id="body-consumer"></tbody></table></div>
       </div>
 
       <div class="page-node" id="tab-news">
@@ -163,6 +168,7 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
 <script>
 let vulns = [];
 const kwOT = ['siemens','schneider','honeywell','rockwell','abb','yokogawa','scada','ics','plc','industrial','power','grid','substation'];
+const kwConsumer = ['apple','android','ios','mac','windows','chrome','samsung','pixel','mobile','phone','browser','safari','firefox','edge'];
 
 const rssFeeds = [
     "https://www.us-cert.gov/ncas/alerts.xml", "https://www.bleepingcomputer.com/feed/",
@@ -186,7 +192,7 @@ function getStableScore(cve) {
 async function syncAll() {
     const btn = document.getElementById('syncBtn');
     btn.textContent = 'Syncing...';
-    
+
     try {
         const res = await fetch("https://corsproxy.io/?https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json");
         const json = await res.json();
@@ -206,7 +212,8 @@ async function syncAll() {
 
 function renderVulns() {
     const otList = vulns.filter(v => kwOT.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)));
-    const itList = vulns.filter(v => !kwOT.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)));
+    const consumerList = vulns.filter(v => kwConsumer.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)) && !kwOT.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)));
+    const itList = vulns.filter(v => !kwOT.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)) && !kwConsumer.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)));
 
     document.getElementById('k-total').textContent = vulns.length;
     document.getElementById('k-crit').textContent = vulns.filter(v => v.score >= 9.0).length;
@@ -214,6 +221,7 @@ function renderVulns() {
     fillTable('body-all', vulns.slice(0, 50), true);
     fillTable('body-it', itList.slice(0, 50), false);
     fillTable('body-ot', otList.slice(0, 50), false);
+    fillTable('body-consumer', consumerList.slice(0, 50), false);
 }
 
 function fillTable(id, data, showStatus) {
@@ -234,10 +242,10 @@ async function fetchNews() {
     let count = 0;
 
     const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
-    
+
     // Process top feeds for UI performance
     const results = await Promise.allSettled(rssFeeds.slice(0, 12).map(url => fetch(proxy + encodeURIComponent(url)).then(r => r.json())));
-    
+
     container.innerHTML = '';
     results.forEach(res => {
         if(res.status === 'fulfilled' && res.value.items) {
