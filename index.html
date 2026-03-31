@@ -34,12 +34,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 
 .sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
 .logo-area{padding:24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white}
+.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;font-size:16px}
 
 .nav-group{padding:16px 12px;flex:1;overflow-y:auto}
 .nav-link{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-md);cursor:pointer;color:var(--text-muted);font-weight:600;margin-bottom:4px;transition:var(--transition)}
 .nav-link:hover{background:var(--surface-hover);color:var(--text)}
 .nav-link.active{background:var(--accent);color:#fff}
+.nav-badge{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(0,0,0,0.2);font-weight:700}
 
 /* BRANDING FOOTER */
 .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.1); margin-top: auto; }
@@ -62,28 +63,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 /* ── TABLES ── */
 .table-container{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto}
 table{width:100%;border-collapse:collapse}
-th{background:var(--surface-hover);padding:14px 20px;text-align:left;font-size:10px;color:var(--text-dim);text-transform:uppercase;cursor:pointer}
+th{background:var(--surface-hover);padding:14px 20px;text-align:left;font-size:10px;color:var(--text-dim);text-transform:uppercase;cursor:pointer;user-select:none}
+th:hover{color:var(--accent)}
 td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
 .row-item:hover{background:rgba(59,130,246,0.05);cursor:pointer}
 
 /* ── NEWS FEED ── */
-.news-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:16px}
-.news-card{background:var(--surface);border:1px solid var(--border);padding:16px;border-radius:var(--radius-md);transition:var(--transition)}
-.news-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:16px}
+.news-card{background:var(--surface);border:1px solid var(--border);padding:20px;border-radius:var(--radius-md);transition:var(--transition);display:flex;flex-direction:column}
+.news-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
 .news-card small{color:var(--accent);font-weight:700;text-transform:uppercase;font-size:10px}
-.news-card h4{margin:8px 0;line-height:1.4}
-.news-card a{color:var(--text-muted);text-decoration:none;font-size:12px}
+.news-card h4{margin:10px 0;font-size:14px;line-height:1.4;color:var(--text)}
+.news-card p{font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:16px;flex:1}
+.news-card a{color:var(--text);background:var(--surface-hover);padding:8px 12px;border-radius:4px;text-decoration:none;font-size:11px;font-weight:600;align-self:flex-start;transition:var(--transition)}
+.news-card a:hover{background:var(--accent);color:#fff}
 
 /* ── DRAWER ── */
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:900;display:none}
 .drawer{position:fixed;top:0;right:0;width:480px;height:100%;background:var(--surface);z-index:1000;transform:translateX(100%);transition:transform 0.3s ease;border-left:1px solid var(--border);display:flex;flex-direction:column}
 .drawer.open{transform:translateX(0)}
+.drawer-header{padding:24px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .drawer-body{padding:32px;overflow-y:auto;flex:1}
 
 @media (max-width: 900px) {
   .app-shell{flex-direction:column}
-  .sidebar{width:100%;height:auto;border-bottom:1px solid var(--border)}
+  .sidebar{width:100%;height:auto;border-bottom:1px solid var(--border);border-right:none}
   .nav-group{display:flex;overflow-x:auto;padding:10px}
+  .nav-link{white-space:nowrap}
   .sidebar-footer{display:none}
   .drawer{width:100%}
 }
@@ -97,12 +103,12 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
       <div class="logo-mark">Z</div>
       <div style="font-weight:800; font-size:18px">ZeroGuard</div>
     </div>
-
+    
     <nav class="nav-group">
       <div class="nav-link active" onclick="switchTab('overview',this)">Overview</div>
-      <div class="nav-link" onclick="switchTab('it',this)">IT Infrastructure</div>
-      <div class="nav-link" onclick="switchTab('ot',this)">OT / ICS Systems</div>
-      <div class="nav-link" onclick="switchTab('consumer',this)">Consumers' Devices</div>
+      <div class="nav-link" onclick="switchTab('it',this)">IT Infrastructure <span class="nav-badge" id="itB">0</span></div>
+      <div class="nav-link" onclick="switchTab('ot',this)">OT / ICS Systems <span class="nav-badge" id="otB">0</span></div>
+      <div class="nav-link" onclick="switchTab('con',this)">Consumer Devices <span class="nav-badge" id="conB">0</span></div>
       <div class="nav-link" onclick="switchTab('news',this)">Global Threat Feed</div>
     </nav>
 
@@ -118,8 +124,8 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
         <h2 id="viewTitle" style="font-size:16px; font-weight:700">Security Operations Command</h2>
         <p id="subTitle" style="font-size:11px; color:var(--text-dim)">Aggregating Intelligence...</p>
       </div>
-      <button onclick="toggleTheme()" style="font-size:18px; padding:10px; background:transparent; border:none; cursor:pointer;">🌓</button>
-      <button onclick="syncAll()" id="syncBtn" style="background:var(--accent); color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:700; cursor:pointer">Refresh All</button>
+      <button onclick="toggleTheme()" style="font-size:18px; cursor:pointer; background:none; border:none; color:var(--text)">🌓</button>
+      <button onclick="syncAll()" id="syncBtn" style="background:var(--accent); color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:700; cursor:pointer">Refresh Data</button>
     </header>
 
     <section class="content-area">
@@ -127,21 +133,21 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
         <div class="kpi-row">
           <div class="kpi-card"><h3>Total Exploits</h3><div class="val" id="k-total">0</div></div>
           <div class="kpi-card"><h3>Critical Risk</h3><div class="val" id="k-crit" style="color:var(--red)">0</div></div>
-          <div class="kpi-card"><h3>Intelligence Nodes</h3><div class="val" id="k-news">0</div></div>
+          <div class="kpi-card"><h3>Active News Nodes</h3><div class="val" id="k-news">0</div></div>
         </div>
-        <div class="table-container"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>CVSS</th><th>Status</th></tr></thead><tbody id="body-all"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th onclick="resort('all','id')">CVE ID</th><th onclick="resort('all','vendor')">Vendor</th><th onclick="resort('all','score')">CVSS</th><th onclick="resort('all','status')">Status</th></tr></thead><tbody id="body-all"></tbody></table></div>
       </div>
 
       <div class="page-node" id="tab-it">
-        <div class="table-container"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>CVSS</th></tr></thead><tbody id="body-it"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th onclick="resort('it','id')">CVE ID</th><th onclick="resort('it','vendor')">Vendor</th><th onclick="resort('it','product')">Product</th><th onclick="resort('it','score')">CVSS</th></tr></thead><tbody id="body-it"></tbody></table></div>
       </div>
 
       <div class="page-node" id="tab-ot">
-        <div class="table-container"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>CVSS</th></tr></thead><tbody id="body-ot"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th onclick="resort('ot','id')">CVE ID</th><th onclick="resort('ot','vendor')">Vendor</th><th onclick="resort('ot','product')">Product</th><th onclick="resort('ot','score')">CVSS</th></tr></thead><tbody id="body-ot"></tbody></table></div>
       </div>
 
-      <div class="page-node" id="tab-consumer">
-        <div class="table-container"><table><thead><tr><th>CVE ID</th><th>Vendor</th><th>Product</th><th>CVSS</th></tr></thead><tbody id="body-consumer"></tbody></table></div>
+      <div class="page-node" id="tab-con">
+        <div class="table-container"><table><thead><tr><th onclick="resort('con','id')">CVE ID</th><th onclick="resort('con','vendor')">Vendor</th><th onclick="resort('con','product')">Product</th><th onclick="resort('con','score')">CVSS</th></tr></thead><tbody id="body-con"></tbody></table></div>
       </div>
 
       <div class="page-node" id="tab-news">
@@ -153,145 +159,64 @@ td{padding:14px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
 
 <div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2 id="dr-id" style="color:var(--accent); font-family:'JetBrains Mono'; font-size:20px; font-weight:800"></h2>
+    <button onclick="closeDrawer()" style="background:none; border:none; color:var(--text); font-size:24px; cursor:pointer">&times;</button>
+  </div>
   <div class="drawer-body">
-    <h2 id="dr-id" style="color:var(--accent); font-family:'JetBrains Mono'"></h2>
-    <h1 id="dr-prod" style="margin:8px 0 24px; font-size:24px"></h1>
-    <label style="font-size:10px; text-transform:uppercase; color:var(--text-dim); font-weight:700">Description</label>
-    <p id="dr-desc" style="margin:12px 0 32px; font-size:15px; color:var(--text-muted); line-height:1.7"></p>
+    <h1 id="dr-prod" style="margin:0 0 24px; font-size:22px"></h1>
+    <label style="font-size:10px; text-transform:uppercase; color:var(--text-dim); font-weight:700">Vulnerability Description</label>
+    <p id="dr-desc" style="margin:12px 0 32px; font-size:14px; color:var(--text-muted); line-height:1.7"></p>
     <div style="background:rgba(244,63,94,0.1); border:1px solid var(--red); padding:24px; border-radius:12px">
       <h4 style="color:var(--red); margin-bottom:8px">Required Action</h4>
-      <p id="dr-action" style="font-weight:600; font-size:14px"></p>
+      <p id="dr-action" style="font-weight:600; font-size:14px; line-height:1.5"></p>
     </div>
   </div>
 </div>
 
 <script>
-let vulns = [];
+// ── STATE & DATA ──
+let dataStore = { it:[], ot:[], con:[], all:[] };
+
 const kwOT = ['siemens','schneider','honeywell','rockwell','abb','yokogawa','scada','ics','plc','industrial','power','grid','substation'];
-const kwConsumer = ['apple','android','ios','mac','windows','chrome','samsung','pixel','mobile','phone','browser','safari','firefox','edge'];
+const kwCon = ['android','ios','iphone','tplink','dlink','netgear','smart','home','router','xiaomi','apple'];
 
 const rssFeeds = [
     "https://www.us-cert.gov/ncas/alerts.xml", "https://www.bleepingcomputer.com/feed/",
     "https://threatpost.com/feed/", "https://www.darkreading.com/rss.xml",
-    "https://krebsonsecurity.com/feed/", "https://cyware.com/rss-feed/",
-    "https://www.securityweek.com/rss", "https://feeds.feedburner.com/TheHackersNews",
-    "https://www.schneier.com/blog/atom.xml", "https://isc.sans.edu/rssfeed.xml",
-    "https://www.fireeye.com/blog/threat-research/_jcr_content.feed",
-    "https://research.checkpoint.com/feed/", "https://therecord.media/feed/",
-    "https://blog.rapid7.com/rss/", "https://www.cisa.gov/cybersecurity-advisories/all.xml"
-];
-
-// ── STABLE CVSS SCORING (NO RANDOM) ──
-function getStableScore(cve) {
-    let hash = 0;
-    for (let i = 0; i < cve.length; i++) hash = cve.charCodeAt(i) + ((hash << 5) - hash);
-    const score = 7.0 + (Math.abs(hash) % 30) / 10; 
-    return score.toFixed(1);
-}
-
-async function syncAll() {
-    const btn = document.getElementById('syncBtn');
-    btn.textContent = 'Syncing...';
-
-    try {
-        const res = await fetch("https://corsproxy.io/?https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json");
-        const json = await res.json();
-        vulns = json.vulnerabilities.map(v => ({
-            id: v.cveID, vendor: v.vendorProject, product: v.product,
-            desc: v.shortDescription, action: v.requiredAction,
-            score: parseFloat(getStableScore(v.cveID)),
-            status: v.dueDate < new Date().toISOString() ? 'Mitigated' : 'Action Needed'
-        }));
-        renderVulns();
-    } catch(e) { console.error("Vuln sync failed"); }
-
-    fetchNews();
-    btn.textContent = 'Refresh All';
-    document.getElementById('subTitle').textContent = `Intelligence Last Synced: ${new Date().toLocaleTimeString()}`;
-}
-
-function renderVulns() {
-    const otList = vulns.filter(v => kwOT.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)));
-    const consumerList = vulns.filter(v => kwConsumer.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)) && !kwOT.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)));
-    const itList = vulns.filter(v => !kwOT.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)) && !kwConsumer.some(k => (v.vendor+v.product+v.desc).toLowerCase().includes(k)));
-
-    document.getElementById('k-total').textContent = vulns.length;
-    document.getElementById('k-crit').textContent = vulns.filter(v => v.score >= 9.0).length;
-
-    fillTable('body-all', vulns.slice(0, 50), true);
-    fillTable('body-it', itList.slice(0, 50), false);
-    fillTable('body-ot', otList.slice(0, 50), false);
-    fillTable('body-consumer', consumerList.slice(0, 50), false);
-}
-
-function fillTable(id, data, showStatus) {
-    document.getElementById(id).innerHTML = data.map(v => `
-        <tr class="row-item" onclick='openDrawer(${JSON.stringify(v).replace(/'/g, "&apos;")})'>
-            <td style="color:var(--accent); font-family:JetBrains Mono; font-weight:700">${v.id}</td>
-            <td><strong>${v.vendor}</strong></td>
-            ${!showStatus ? `<td>${v.product}</td>` : ''}
-            <td style="font-family:JetBrains Mono; font-weight:700; color:${v.score >= 9 ? 'var(--red)' : 'var(--yellow)'}">${v.score.toFixed(1)}</td>
-            ${showStatus ? `<td><span style="font-size:10px; font-weight:700; color:${v.status==='Mitigated'?'var(--green)':'var(--yellow)'}">${v.status}</span></td>` : ''}
-        </tr>
-    `).join('');
-}
-
-async function fetchNews() {
-    const container = document.getElementById('feedContainer');
-    container.innerHTML = '<p style="padding:20px">Scanning global RSS feeds...</p>';
-    let count = 0;
-
-    const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
-
-    // Process top feeds for UI performance
-    const results = await Promise.allSettled(rssFeeds.slice(0, 12).map(url => fetch(proxy + encodeURIComponent(url)).then(r => r.json())));
-
-    container.innerHTML = '';
-    results.forEach(res => {
-        if(res.status === 'fulfilled' && res.value.items) {
-            res.value.items.slice(0, 2).forEach(item => {
-                count++;
-                container.innerHTML += `
-                    <div class="news-card">
-                        <small>${res.value.feed.title || 'Threat Intel'}</small>
-                        <h4 style="font-size:14px">${item.title}</h4>
-                        <a href="${item.link}" target="_blank">View Full Intel →</a>
-                    </div>
-                `;
-            });
-        }
-    });
-    document.getElementById('k-news').textContent = count;
-}
-
-function openDrawer(v) {
-    document.getElementById('dr-id').textContent = v.id;
-    document.getElementById('dr-prod').textContent = v.product;
-    document.getElementById('dr-desc').textContent = v.desc;
-    document.getElementById('dr-action').textContent = v.action;
-    document.getElementById('drawer').classList.add('open');
-    document.getElementById('overlay').style.display = 'block';
-}
-
-function closeDrawer() {
-    document.getElementById('drawer').classList.remove('open');
-    document.getElementById('overlay').style.display = 'none';
-}
-
-function switchTab(id, el) {
-    document.querySelectorAll('.page-node').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.getElementById('tab-' + id).classList.add('active');
-    el.classList.add('active');
-    document.getElementById('viewTitle').textContent = el.textContent;
-}
-
-function toggleTheme() {
-    const root = document.documentElement;
-    root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-}
-
-syncAll();
-</script>
-</body>
-</html>
+    "https://www.sans.org/webcasts/rss", "https://krebsonsecurity.com/feed/",
+    "https://cyware.com/rss-feed/", "https://www.securityweek.com/rss",
+    "https://feeds.feedburner.com/TheHackersNews", "https://www.schneier.com/blog/atom.xml",
+    "https://isc.sans.edu/rssfeed.xml", "https://www.fireeye.com/blog/threat-research/_jcr_content.feed",
+    "https://blogs.cisco.com/security/feed", "https://www.mcafee.com/blogs/feed/",
+    "https://nakedsecurity.sophos.com/feed/", "https://www.tripwire.com/state-of-security/feed/",
+    "https://research.checkpoint.com/feed/", "https://www.zdnet.com/topic/security/rss.xml",
+    "https://www.infosecurity-magazine.com/rss/news/", "https://cybersecurity.att.com/site/blog-all-rss",
+    "https://www.cybereason.com/blog/rss.xml", "https://blog.qualys.com/feed/",
+    "https://www.tenable.com/blog/feed", "https://www.blackhillsinfosec.com/feed/",
+    "https://rss.packetstormsecurity.com/files/", "https://unit42.paloaltonetworks.com/feed/",
+    "https://www.arbornetworks.com/blog/asert/feed/", "https://www.trendmicro.com/rss/index.xml",
+    "https://www.crowdstrike.com/blog/feed/", "https://securityaffairs.co/wordpress/feed",
+    "http://blog.crowdstrike.com/feed", "http://blog.emsisoft.com/feed/",
+    "http://blog.eset.com/feed", "http://blog.jpcert.or.jp/atom.xml",
+    "http://blog.morphisec.com/rss.xml", "http://blogs.technet.com/mmpc/rss.xml",
+    "http://blogs.technet.com/msrc/rss.xml", "http://cybersecuritynews.es/feed/",
+    "http://cyberseguridad.net/index.php?format=feed&amp;type=rss", "http://feeds.feedblitz.com/alienvault-blogs&amp;x=1",
+    "http://feeds.feedblitz.com/alienvault-security-essentials", "http://feeds.feedburner.com/andreafortuna",
+    "http://feeds.feedburner.com/darknethackers", "http://feeds.feedburner.com/dragonjar/pKru",
+    "http://feeds.feedburner.com/FluProject", "http://feeds.feedburner.com/PentestTools",
+    "http://feeds.trendmicro.com/TrendMicroResearch", "http://feeds.trendmicro.com/TrendMicroSecurityAdvisories",
+    "http://iscxml.sans.org/rssfeed.xml", "http://pax0r.com/feed/",
+    "http://researchcenter.paloaltonetworks.com/feed/", "http://seclists.org/rss/bugtraq.rss",
+    "http://seguridadyredes.wordpress.com/feed/", "http://thehackerway.com/feed/",
+    "http://vrt-sourcefire.blogspot.com/feeds/posts/default", "http://www.darkreading.com/rss/all.xml",
+    "http://www.exploit-db.com/rss.php", "http://www.hackingarticles.in/feed/",
+    "http://www.intezer.com/feed/", "http://www.kb.cert.org/vulfeed/",
+    "http://www.securelist.com/en/rss/allupdates", "http://www.seguridadjabali.com/feeds/posts/default",
+    "http://www.seguridadyfirewall.cl/feeds/posts/default", "http://www.us-cert.gov/channels/bulletins.rdf",
+    "http://www.us-cert.gov/current/index.rdf", "http://www.volexity.com/blog/?feed=rss2",
+    "https://asec.ahnlab.com/en/feed/", "https://bellingcat.com/feed/",
+    "https://blog.gigamon.com/feed/", "https://blog.google/threat-analysis-group/rss",
+    "https://blog.qualys.com/feed/", "https://blogs.cisco.com/security/feed",
+    "https://bushidotoken.blogspot.com/feeds/posts/default", "https://ciberseguridad.blog/rss/",
+    "https://citizenlab.org/category/lab-news/feed/", "https://cybersecurity.att.com/site/blog-all-rss",
